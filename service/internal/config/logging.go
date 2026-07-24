@@ -30,6 +30,13 @@ func buildLogger(jsonLogging bool, opts *slog.HandlerOptions) *slog.Logger {
 	return slog.New(handler)
 }
 
+// ConfigureSlog configures the default slog logger using Viper settings.
+//
+// The log-level setting controls the minimum enabled logging level.
+// This can be set to debug, info, warn, or error. Invalid values default to info.
+//
+// When json-logging is true, logs use slog's JSON handler. Otherwise, they use
+// the text handler.
 func ConfigureSlog() {
 
 	jsonLogging := viper.GetBool("json-logging")

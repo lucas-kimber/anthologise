@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// LoadViper loads variables into viper and sets defaults for the service.
 func LoadViper() {
 
 	viper.SetDefault("json-logging", false)
