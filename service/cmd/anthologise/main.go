@@ -2,9 +2,13 @@ package main
 
 import (
 	"github.com/lucas-kimber/anthologise/internal/api"
+	"github.com/lucas-kimber/anthologise/internal/config"
 )
 
 func main() {
+
+	config.LoadViper()
+	config.ConfigureSlog()
 
 	r := api.NewRouter()
 

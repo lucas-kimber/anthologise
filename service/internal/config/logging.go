@@ -1,3 +1,52 @@
 package config
 
-func ConfigureSlog() {}
+import (
+	"log/slog"
+	"os"
+
+	"github.com/spf13/viper"
+)
+
+func parseLogLevel(strLevel string) (slog.Level, bool) {
+
+	var logLevel slog.Level
+	ok := true
+
+	if err := logLevel.UnmarshalText([]byte(strLevel)); err != nil {
+		logLevel = slog.LevelInfo
+		ok = false
+	}
+	return logLevel, ok
+}
+
+func buildLogger(jsonLogging bool, opts *slog.HandlerOptions) *slog.Logger {
+
+	var handler slog.Handler = slog.NewTextHandler(os.Stdout, opts)
+
+	if jsonLogging {
+		handler = slog.NewJSONHandler(os.Stdout, opts)
+	}
+
+	return slog.New(handler)
+}
+
+func ConfigureSlog() {
+
+	jsonLogging := viper.GetBool("json-logging")
+	lvl := viper.GetString("log-level")
+
+	logLevel, lvlOk := parseLogLevel(lvl)
+
+	opts := &slog.HandlerOptions{
+		Level: logLevel,
+	}
+	logger := buildLogger(jsonLogging, opts)
+
+	slog.SetDefault(logger)
+
+	if !lvlOk {
+		slog.Warn("No valid logging level was passed, defaulted to INFO")
+	}
+
+	slog.Info("Logger Successfully Initialised")
+}
