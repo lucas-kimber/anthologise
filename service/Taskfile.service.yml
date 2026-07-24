@@ -3,7 +3,8 @@
 version: "3"
 
 vars:
-  COMPOSE_SERVICE: service
+  MAIN_PATH: cmd/anthologise/main.go
+  SERVICE_NAME: service
 
 tasks:
 
@@ -15,24 +16,31 @@ tasks:
   build:
     desc: Build the backend service image
     cmds:
-      - docker compose build {{.COMPOSE_SERVICE}}
+      - docker compose build {{.SERVICE_NAME}}
 
   up:
     desc: Build and run the backend service
     cmds:
-      - docker compose up --build --detach {{.COMPOSE_SERVICE}}
+      - docker compose up --build --detach {{.SERVICE_NAME}}
 
   stop:
     desc: Stop the backend service
     cmds:
-      - docker compose stop {{.COMPOSE_SERVICE}}
+      - docker compose stop {{.SERVICE_NAME}}
 
   remove:
     desc: Stop and remove the backend service container
     cmds:
-      - docker compose rm --stop --force {{.COMPOSE_SERVICE}}
+      - docker compose rm --stop --force {{.SERVICE_NAME}}
 
   logs:
     desc: Follow the backend service logs
     cmds:
-      - docker compose logs --follow {{.COMPOSE_SERVICE}}
+      - docker compose logs --follow {{.SERVICE_NAME}}
+  
+  runlocal:
+    desc: Tidy and run the backend service locally, without Docker.
+    dir: ./{{.SERVICE_NAME}}
+    cmds:
+      - go mod tidy
+      - go run {{.MAIN_PATH}}
