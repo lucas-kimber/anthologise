@@ -2,16 +2,22 @@
 
 ## Dev Info
 
-### Run
+### Running the Project
 
-Taskfile is used to manage the 
+Taskfile is used to manage developement commands and different lifecycle targets.
+The root taskfile acts as an entrypoint to sub-taskfiles. Each sub-taskfile manages the compose commands for its container (and uses the workdir of the super taskfile).
 
-To run locally:
+To see available tasks:
 ```bash
-go mod tidy && go run .
+task
 ```
 
-Add localhost manifest to StremIO:
+To see available tasks for a give sub-taskfile, for example service:
+```bash
+task service
+```
+
+Once the service is running, to add the locally hosted manifest to Stremio, paste the following into Stremio's add by URL option:
 ```text
 http://127.0.0.1:7000/manifest.json
 ```

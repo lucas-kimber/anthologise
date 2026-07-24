@@ -3,13 +3,37 @@
 version: "3"
 
 includes:
-  service: 
+  service:
     taskfile: ./service/Taskfile.service.yml
-    dir: ./service
 
 tasks:
   default:
-    desc: Lists the available tasks.
+    desc: List the available tasks
     cmds:
       - task --list
     silent: true
+
+  all:build:
+    desc: Build all application images
+    cmds:
+      - docker compose build
+
+  all:up:
+    desc: Build and run the entire application stack
+    cmds:
+      - docker compose up --build --detach
+
+  all:stop:
+    desc: Stop the entire application stack
+    cmds:
+      - docker compose stop
+
+  all:down:
+    desc: Stop and remove the entire application stack
+    cmds:
+      - docker compose down
+
+  all:logs:
+    desc: Follow logs from the entire application stack
+    cmds:
+      - docker compose logs --follow

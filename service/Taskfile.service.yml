@@ -3,44 +3,36 @@
 version: "3"
 
 vars:
-  APP_NAME: "anthologise"
-  SERVICE_NAME: "{{.APP_NAME}}-service"
-  CONTAINER_NAME: "{{.APP_NAME}}-service"
-  PORT_BINDING: "7000:7000"
-  MAIN_PATH: "./cmd/{{.APP_NAME}}"
+  COMPOSE_SERVICE: service
 
 tasks:
-  
+
   default:
     cmds:
-      - task --list
+      - task --taskfile "{{.TASKFILE}}" --list
     silent: true
 
   build:
-    desc: Build the project container.
+    desc: Build the backend service image
     cmds:
-      - >-
-        docker build 
-        --build-arg ENTRY_POINT={{.MAIN_PATH}} 
-        -f Dockerfile 
-        -t {{.SERVICE_NAME}} .
-  
-  start:
-    desc: Start the container. 
+      - docker compose build {{.COMPOSE_SERVICE}}
+
+  up:
+    desc: Build and run the backend service
     cmds:
-      - >-
-        docker run 
-        -d --name {{.CONTAINER_NAME}} 
-        -p {{.PORT_BINDING}} {{.SERVICE_NAME}}
-  
-  remove:
-    desc: Remove the project container.
-    cmds:
-      - docker rm -f {{.CONTAINER_NAME}}
-    ignore_error: true
-      
+      - docker compose up --build --detach {{.COMPOSE_SERVICE}}
+
   stop:
-    desc: Stop the project container.
+    desc: Stop the backend service
     cmds:
-      - docker stop {{.CONTAINER_NAME}}
-    ignore_error: true
+      - docker compose stop {{.COMPOSE_SERVICE}}
+
+  remove:
+    desc: Stop and remove the backend service container
+    cmds:
+      - docker compose rm --stop --force {{.COMPOSE_SERVICE}}
+
+  logs:
+    desc: Follow the backend service logs
+    cmds:
+      - docker compose logs --follow {{.COMPOSE_SERVICE}}

@@ -1,0 +1,12 @@
+name: anthologise
+
+services:
+  service:
+    build:
+      context: ./service
+      dockerfile: Dockerfile
+      args:
+        ENTRY_POINT: ./cmd/anthologise
+
+    ports:
+      - "7000:7000"
