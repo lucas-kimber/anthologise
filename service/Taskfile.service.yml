@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: "3"
+
+vars:
+  APP_NAME: "anthologise"
+  SERVICE_NAME: "{{.APP_NAME}}-service"
+  CONTAINER_NAME: "{{.APP_NAME}}-service"
+  PORT_BINDING: "7000:7000"
+  MAIN_PATH: "./cmd/{{.APP_NAME}}"
+
+tasks:
+  
+  default:
+    cmds:
+      - task --list
+    silent: true
+
+  build:
+    desc: Build the project container.
+    cmds:
+      - >-
+        docker build 
+        --build-arg ENTRY_POINT={{.MAIN_PATH}} 
+        -f Dockerfile 
+        -t {{.SERVICE_NAME}} .
+  
+  start:
+    desc: Start the container. 
+    cmds:
+      - >-
+        docker run 
+        -d --name {{.CONTAINER_NAME}} 
+        -p {{.PORT_BINDING}} {{.SERVICE_NAME}}
+  
+  remove:
+    desc: Remove the project container.
+    cmds:
+      - docker rm -f {{.CONTAINER_NAME}}
+    ignore_error: true
+      
+  stop:
+    desc: Stop the project container.
+    cmds:
+      - docker stop {{.CONTAINER_NAME}}
+    ignore_error: true
