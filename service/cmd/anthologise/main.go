@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/lucas-kimber/anthologise/internal/api"
-	"github.com/lucas-kimber/anthologise/internal/config"
+	"github.com/lucas-kimber/anthologise/service/internal/api"
+	"github.com/lucas-kimber/anthologise/service/internal/config"
 )
 
 func main() {

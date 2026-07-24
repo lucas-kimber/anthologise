@@ -1,4 +1,4 @@
-module github.com/lucas-kimber/anthologise
+module github.com/lucas-kimber/anthologise/service
 
 go 1.25.0
 

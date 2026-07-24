@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	store "github.com/lucas-kimber/anthologise/internal/storage"
+	store "github.com/lucas-kimber/anthologise/service/internal/storage"
 )
 
 func getCatalog(c *gin.Context) {

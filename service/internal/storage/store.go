@@ -1,6 +1,6 @@
 package store
 
-import "github.com/lucas-kimber/anthologise/internal/stremio"
+import "github.com/lucas-kimber/anthologise/service/internal/stremio"
 
 func GetManifestByToken(token string) (stremio.Manifest, bool) {
 	return stremio.Manifest{
