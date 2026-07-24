@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	store "github.com/lucas-kimber/anylist-poc/internal/storage"
+	store "github.com/lucas-kimber/anthologise/internal/storage"
 )
 
 func getManifest(c *gin.Context) {

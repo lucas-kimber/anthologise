@@ -9,7 +9,7 @@ import (
 )
 
 // Creates a Gin router configured with Slog and the various
-// AnyList API handlers.
+// anthologise API handlers.
 func NewRouter() *gin.Engine {
 
 	l := slog.Default()

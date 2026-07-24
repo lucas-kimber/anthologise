@@ -3,12 +3,12 @@
 package stremio
 
 const (
-	addonID   = "dev.anylist.poc"
-	listID    = "anylist_star_trek_poc"
-	catalogID = "anylist"
+	addonID   = "dev.anthologise.poc"
+	listID    = "anthologise_star_trek_poc"
+	catalogID = "anthologise"
 )
 
-// Describes the StremIO manifest for AnyList.
+// Describes the StremIO manifest for anthologise.
 // This contains all the plugin info:
 // https://stremio.github.io/stremio-addon-guide/step1
 type Manifest struct {

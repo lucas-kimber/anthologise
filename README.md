@@ -1,8 +1,10 @@
-# AnyList
+# Anthologise
 
 ## Dev Info
 
 ### Run
+
+Taskfile is used to manage the 
 
 To run locally:
 ```bash

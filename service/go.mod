@@ -1,4 +1,4 @@
-module github.com/lucas-kimber/anylist-poc
+module github.com/lucas-kimber/anthologise
 
 go 1.25.0
 

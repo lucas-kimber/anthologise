@@ -1,27 +1,27 @@
 package store
 
-import "github.com/lucas-kimber/anylist-poc/internal/stremio"
+import "github.com/lucas-kimber/anthologise/internal/stremio"
 
 func GetManifestByToken(token string) (stremio.Manifest, bool) {
 	return stremio.Manifest{
-		ID:          "dev.anylist.poc",
+		ID:          "dev.anthologise.poc",
 		Version:     "0.1.0",
-		Name:        "AnyList",
+		Name:        "anthologise",
 		Description: "Ipsum Lorum",
 		Resources: []any{
 			"catalog",
 			map[string]any{
 				"name":       "meta",
 				"types":      []string{"series"},
-				"idPrefixes": []string{"anylist_"},
+				"idPrefixes": []string{"anthologise_"},
 			},
 		},
 		Types: []string{"series"},
 		Catalogs: []stremio.Catalog{
 			{
 				Type: "series",
-				ID:   "anylist",
-				Name: "AnyList",
+				ID:   "anthologise",
+				Name: "anthologise",
 			},
 		},
 	}, true
@@ -30,9 +30,9 @@ func GetManifestByToken(token string) (stremio.Manifest, bool) {
 func GetCatalogsByToken(token string) ([]stremio.Anthology, bool) {
 	return []stremio.Anthology{
 		{
-			ID:          "anylist_star_trek_poc",
+			ID:          "anthologise_star_trek_poc",
 			Type:        "series",
-			Name:        "AnyList - Star Trek POC",
+			Name:        "anthologise - Star Trek POC",
 			Poster:      "https://images.metahub.space/poster/medium/tt0244365/img",
 			Description: "A deliberately mixed sequence of Enterprise and Discovery episodes.",
 			Genres:      []string{"Science Fiction", "Proof of Concept"},
@@ -42,9 +42,9 @@ func GetCatalogsByToken(token string) ([]stremio.Anthology, bool) {
 
 func GetAnthologiesByToken(token string) (stremio.Anthology, bool) {
 	return stremio.Anthology{
-		ID:          "anylist_star_trek_poc",
+		ID:          "anthologise_star_trek_poc",
 		Type:        "series",
-		Name:        "AnyList - Star Trek POC",
+		Name:        "anthologise - Star Trek POC",
 		Poster:      "https://images.metahub.space/poster/medium/tt0244365/img",
 		Description: "A deliberately mixed sequence of Enterprise and Discovery episodes.",
 		Genres:      []string{"Science Fiction", "Proof of Concept"},

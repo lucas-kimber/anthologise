@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/lucas-kimber/anylist-poc/internal/api"
+	"github.com/lucas-kimber/anthologise/internal/api"
 )
 
 func main() {
