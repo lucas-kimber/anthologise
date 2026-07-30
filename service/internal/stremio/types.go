@@ -22,6 +22,10 @@ type Manifest struct {
 	IDPrefixes  []string  `json:"idPrefixes,omitempty"`
 }
 
+type Meta struct {
+	
+}
+
 // Describes a single Stremio catalog.
 // A catalog is just a shelf associated with the plugin:
 // https://stremio.github.io/stremio-addon-guide/step3

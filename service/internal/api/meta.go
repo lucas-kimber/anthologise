@@ -5,14 +5,13 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	store "github.com/lucas-kimber/anthologise/service/internal/storage"
 )
 
-func getMeta(c *gin.Context) {
+func (s *server) getMeta(c *gin.Context) {
 	id := "1"
-	anthology, ok := store.GetAnthologiesByToken(id)
+	anthology, err := s.store.GetAnthology(id, "_")
 
-	if !ok {
+	if err != nil {
 		slog.Error("failed to find anthology", "id", id)
 		c.JSON(http.StatusNotFound, gin.H{"error": "anthology not found"})
 		return
