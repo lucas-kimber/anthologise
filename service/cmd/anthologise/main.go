@@ -7,12 +7,12 @@ import (
 
 func main() {
 
-	config.LoadViper()
-	config.ConfigureSlog()
+	cfg := config.LoadViper()
+	config.ConfigureSlog(cfg)
 
 	r := api.NewRouter()
 
 	if err := r.Run(":7000"); err != nil {
-		panic("Fatal Error, couldn't start Gin: " + err.Error())
+		panic("Fatal error, couldn't start Gin: " + err.Error())
 	}
 }
