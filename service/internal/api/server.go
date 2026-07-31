@@ -1,11 +1,15 @@
 package api
 
+import "github.com/lucas-kimber/anthologise/service/internal/stremio"
+
 type server struct {
-	store Store
+	manifest stremio.Manifest
+	store    Store
 }
 
-func newServer(store Store) *server {
+func newServer(manifest stremio.Manifest, store Store) *server {
 	return &server{
+		manifest,
 		store,
 	}
 }

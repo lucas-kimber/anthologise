@@ -8,22 +8,40 @@ const (
 	catalogID = "anthologise"
 )
 
+type ManifestConfig struct {
+	ID          string
+	Version     string
+	Name        string
+	Description string
+	Logo        string
+}
+
 // Describes the StremIO manifest for anthologise.
 // This contains all the plugin info:
 // https://stremio.github.io/stremio-addon-guide/step1
 type Manifest struct {
-	ID          string    `json:"id"`
-	Version     string    `json:"version"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Resources   []any     `json:"resources"`
-	Types       []string  `json:"types"`
-	Catalogs    []Catalog `json:"catalogs"`
-	IDPrefixes  []string  `json:"idPrefixes,omitempty"`
+	ID          string `json:"id"`
+	Version     string `json:"version"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Logo        string `json:"logo"`
+	// Resources   []any     `json:"resources"`
+	// Types       []string  `json:"types"`
+	// Catalogs    []Catalog `json:"catalogs"`
+	// IDPrefixes  []string  `json:"idPrefixes,omitempty"`
+}
+
+func NewManifest(cfg ManifestConfig) Manifest {
+	return Manifest{
+		cfg.ID,
+		cfg.Version,
+		cfg.Name,
+		cfg.Description,
+		cfg.Logo,
+	}
 }
 
 type Meta struct {
-	
 }
 
 // Describes a single Stremio catalog.
