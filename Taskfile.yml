@@ -6,6 +6,9 @@ includes:
   service:
     taskfile: ./service/Taskfile.service.yml
 
+dotenv:
+  - ./service/.env.local
+
 tasks:
   default:
     desc: List the available tasks
