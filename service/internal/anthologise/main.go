@@ -17,6 +17,7 @@ func main() {
 		Name:        cfg.App.Name,
 		Description: cfg.App.Description,
 		Logo:        cfg.App.LogoURL,
+		CatalogName: cfg.App.MainCatalogName,
 	})
 
 	var store api.Store

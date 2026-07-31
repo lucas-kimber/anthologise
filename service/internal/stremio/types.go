@@ -3,9 +3,10 @@
 package stremio
 
 const (
-	addonID   = "dev.anthologise.poc"
-	listID    = "anthologise_star_trek_poc"
-	catalogID = "anthologise"
+	catalogID         = "anthologise"
+	catalogName       = "My Anthologise"
+	anthologyIDPrefix = "anthologies_"
+	seriesType        = "series"
 )
 
 type ManifestConfig struct {
@@ -14,43 +15,64 @@ type ManifestConfig struct {
 	Name        string
 	Description string
 	Logo        string
+	CatalogName string
 }
 
 // Describes the StremIO manifest for anthologise.
 // This contains all the plugin info:
 // https://stremio.github.io/stremio-addon-guide/step1
 type Manifest struct {
-	ID          string `json:"id"`
-	Version     string `json:"version"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Logo        string `json:"logo"`
-	// Resources   []any     `json:"resources"`
-	// Types       []string  `json:"types"`
-	// Catalogs    []Catalog `json:"catalogs"`
-	// IDPrefixes  []string  `json:"idPrefixes,omitempty"`
+	ID          string    `json:"id"`
+	Version     string    `json:"version"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Logo        string    `json:"logo"`
+	Resources   []any     `json:"resources"`
+	Types       []string  `json:"types"`
+	Catalogs    []Catalog `json:"catalogs"`
+}
+
+type Resource struct {
+	Name       string   `json:"name"`
+	Types      []string `json:"types"`
+	IDPrefixes []string `json:"idPrefixes,omitempty"`
+}
+
+type Catalog struct {
+	ID   string `json:"id"`
+	Type string `json:"type"`
+	Name string `json:"name"`
 }
 
 func NewManifest(cfg ManifestConfig) Manifest {
 	return Manifest{
-		cfg.ID,
-		cfg.Version,
-		cfg.Name,
-		cfg.Description,
-		cfg.Logo,
+		ID:          cfg.ID,
+		Version:     cfg.Version,
+		Name:        cfg.Name,
+		Description: cfg.Description,
+		Logo:        cfg.Logo,
+		Resources: []any{
+			"catalog",
+			Resource{
+				Name:       "meta",
+				Types:      []string{seriesType},
+				IDPrefixes: []string{anthologyIDPrefix},
+			},
+		},
+		Types: []string{
+			seriesType,
+		},
+		Catalogs: []Catalog{
+			{
+				ID:   catalogID,
+				Type: seriesType,
+				Name: cfg.CatalogName,
+			},
+		},
 	}
 }
 
 type Meta struct {
-}
-
-// Describes a single Stremio catalog.
-// A catalog is just a shelf associated with the plugin:
-// https://stremio.github.io/stremio-addon-guide/step3
-type Catalog struct {
-	Type string `json:"type"`
-	ID   string `json:"id"`
-	Name string `json:"name"`
 }
 
 // An Anthology acts as a series wrapper for vidios.

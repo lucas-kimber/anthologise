@@ -35,14 +35,14 @@ func buildLogger(jsonLogging bool, opts *slog.HandlerOptions) *slog.Logger {
 //
 // When json-logging is true, logs use slog's JSON handler. Otherwise, they use
 // the text handler.
-func ConfigureSlog(cfg Config) {
+func ConfigureSlog(cfg LogConfig) {
 
-	logLevel, lvlOk := parseLogLevel(cfg.Log.Level)
+	logLevel, lvlOk := parseLogLevel(cfg.Level)
 
 	lvl := &slog.HandlerOptions{
 		Level: logLevel,
 	}
-	logger := buildLogger(cfg.Log.FormatJSON, lvl)
+	logger := buildLogger(cfg.FormatJSON, lvl)
 
 	slog.SetDefault(logger)
 

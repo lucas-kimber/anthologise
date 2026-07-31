@@ -7,14 +7,15 @@ import (
 )
 
 const (
-	envPrefix         = "ANTHOLOGISE"
-	keyLogJSON        = "json-logging"
-	keyLogLevel       = "log-level"
-	keyAppStremioID   = "stremio-id"
-	keyAppVersion     = "version-number"
-	keyAppName        = "app-name"
-	keyAppDescription = "manifest-description"
-	keyAppLogoURL     = "logo-url"
+	envPrefix             = "ANTHOLOGISE"
+	keyLogJSON            = "json-logging"
+	keyLogLevel           = "log-level"
+	keyAppStremioID       = "stremio-id"
+	keyAppVersion         = "version-number"
+	keyAppName            = "app-name"
+	keyAppDescription     = "manifest-description"
+	keyAppLogoURL         = "logo-url"
+	keyAppMainCatalogName = "main-catalog-name"
 )
 
 // AppConfig contains all the app related options
@@ -29,6 +30,8 @@ type AppConfig struct {
 	Description string
 	// LogoURL is the URL to the add-on's logo which will be used to display it in Stremio
 	LogoURL string
+	// MainCatalogName is the display name of the catalog that will show all the user's anthology series
+	MainCatalogName string
 }
 
 // LogConfig contains all the logging options
@@ -56,6 +59,7 @@ func loadApp(v *viper.Viper) AppConfig {
 		v.GetString(keyAppName),
 		v.GetString(keyAppDescription),
 		v.GetString(keyAppLogoURL),
+		v.GetString(keyAppMainCatalogName),
 	}
 }
 
