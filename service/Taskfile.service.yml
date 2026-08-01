@@ -50,3 +50,11 @@ tasks:
     dir: ./service
     cmds:
       - cp .env.example .env.local
+    
+  test:
+    desc: Run the service's test cases.
+    dir: ./service
+    env:
+      ANTHOLOGISE_LOG_LEVEL: debug
+    cmds:
+      - go test ./...

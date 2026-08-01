@@ -40,3 +40,8 @@ tasks:
     desc: Follow logs from the entire application stack
     cmds:
       - docker compose logs --follow
+    
+  all:test:
+    desc: Run all the tests for the project
+    cmds:
+      - task: service:test
