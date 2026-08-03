@@ -1,0 +1,34 @@
+name: Test Anthologise Service
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "service/**"
+      - ".github/workflows/service-tests.yml"
+
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "service/**"
+      - ".github/workflows/service-tests.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: service
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: service/go.mod
+          cache-dependency-path: service/go.sum
+
+      - name: Test
+        run: go test -v ./...
