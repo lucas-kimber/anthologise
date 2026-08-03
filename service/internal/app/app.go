@@ -9,9 +9,13 @@ import (
 	"github.com/lucas-kimber/anthologise/service/internal/stremio"
 )
 
-func NewApp() *gin.Engine {
+func New() *gin.Engine {
 	cfg := config.LoadViper()
-	config.ConfigureSlog(cfg.Log)
+
+	l := config.ConfigureSlog(cfg.Log)
+	slog.SetDefault(l)
+
+	l.Info("logger initialised")
 
 	slog.Info(
 		"config found and set",
