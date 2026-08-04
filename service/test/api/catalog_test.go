@@ -11,7 +11,7 @@ import (
 	"github.com/lucas-kimber/anthologise/service/internal/stremio"
 )
 
-func TestGetManifest(t *testing.T) {
+func TestGetCatalog(t *testing.T) {
 
 	t.Setenv("ANTHOLOGISE_STREMIO_ID", "testid")
 	t.Setenv("ANTHOLOGISE_VERSION_NUMBER", "testversion")
