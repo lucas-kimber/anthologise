@@ -1,0 +1,41 @@
+name: Lint and Test Anthologise Service
+
+on:
+  workflow_dispatch:
+    
+  push:
+    branches: ["main"]
+    paths:
+      - "service/**"
+      - ".github/workflows/service-tests.yml"
+
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "service/**"
+      - ".github/workflows/service-tests.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: service
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: service/go.mod
+          cache-dependency-path: service/go.sum
+
+      - name: Lint
+        run: |
+          go vet ./...
+          go tool staticcheck ./...
+
+      - name: Test
+        run: go test -v ./...

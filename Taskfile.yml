@@ -16,32 +16,39 @@ tasks:
       - task --list
     silent: true
 
-  all:build:
+  build:
     desc: Build all application images
     cmds:
       - docker compose build
 
-  all:up:
+  up:
     desc: Build and run the entire application stack
     cmds:
       - docker compose up --build --detach
 
-  all:stop:
+  stop:
     desc: Stop the entire application stack
     cmds:
       - docker compose stop
 
-  all:down:
+  down:
     desc: Stop and remove the entire application stack
     cmds:
       - docker compose down
 
-  all:logs:
+  logs:
     desc: Follow logs from the entire application stack
     cmds:
       - docker compose logs --follow
     
-  all:test:
+  test:
     desc: Run all the tests for the project
     cmds:
       - task: service:test
+
+  lint:
+    desc: Run all project linting.
+    cmds:
+      - task: service:lint
+      - cmd: echo "All lint checks passed"
+        silent: true

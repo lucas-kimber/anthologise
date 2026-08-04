@@ -9,7 +9,7 @@ type server struct {
 
 func newServer(manifest stremio.Manifest, store Store) *server {
 	return &server{
-		manifest,
-		store,
+		manifest: manifest,
+		store:    store,
 	}
 }

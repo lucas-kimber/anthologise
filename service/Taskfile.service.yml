@@ -58,3 +58,12 @@ tasks:
       ANTHOLOGISE_LOG_LEVEL: debug
     cmds:
       - go test ./...
+    
+  lint:
+    desc: Run staticcheck and go vet on the service.
+    dir: ./service
+    cmds:
+      - go vet ./...
+      - go tool staticcheck ./...
+      - cmd: echo "Service passed lint check"
+        silent: true

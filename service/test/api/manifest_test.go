@@ -29,7 +29,7 @@ func TestGetManifest(t *testing.T) {
 	t.Setenv("ANTHOLOGISE_LOGO_URL", "testlogo")
 	t.Setenv("ANTHOLOGISE_MAIN_CATALOG_NAME", "testcatalog")
 
-	router := app.NewApp()
+	router := app.New()
 
 	req, _ := http.NewRequest(http.MethodGet, "/manifest.json", nil)
 	res := httptest.NewRecorder()
