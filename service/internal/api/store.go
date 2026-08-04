@@ -1,6 +1,12 @@
 package api
 
-import "github.com/lucas-kimber/anthologise/service/internal/stremio"
+import (
+	"errors"
+
+	"github.com/lucas-kimber/anthologise/service/internal/stremio"
+)
+
+var ErrNotFound = errors.New("store item not found")
 
 // Store defines the methods that the API handlers expect to be available for retreiving resources from the database
 type Store interface {
