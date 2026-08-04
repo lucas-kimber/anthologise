@@ -7,49 +7,51 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/lucas-kimber/anthologise/service/internal/api"
 	"github.com/lucas-kimber/anthologise/service/internal/stremio"
 )
 
 func TestGetManifest(t *testing.T) {
+	t.Setenv("ANTHOLOGISE_STREMIO_ID", testID)
+	t.Setenv("ANTHOLOGISE_VERSION_NUMBER", testVersion)
+	t.Setenv("ANTHOLOGISE_APP_NAME", testName)
+	t.Setenv("ANTHOLOGISE_MANIFEST_DESCRIPTION", testDescription)
+	t.Setenv("ANTHOLOGISE_LOGO_URL", testLogo)
+	t.Setenv("ANTHOLOGISE_MAIN_CATALOG_NAME", testCatalogName)
 
-	t.Setenv("ANTHOLOGISE_STREMIO_ID", "testid")
-	t.Setenv("ANTHOLOGISE_VERSION_NUMBER", "testversion")
-	t.Setenv("ANTHOLOGISE_APP_NAME", "testname")
-	t.Setenv("ANTHOLOGISE_MANIFEST_DESCRIPTION", "testdescription")
-	t.Setenv("ANTHOLOGISE_LOGO_URL", "testlogo")
-	t.Setenv("ANTHOLOGISE_MAIN_CATALOG_NAME", "testcatalog")
+	router := newTestRouter(nil)
 
-	var store api.Store
-	router := newTestRouter(store)
-
-	req, _ := http.NewRequest(http.MethodGet, "/manifest.json", nil)
+	req := httptest.NewRequest(http.MethodGet, "/manifest.json", nil)
 	res := httptest.NewRecorder()
 
 	router.ServeHTTP(res, req)
 
 	if res.Code != http.StatusOK {
-		t.Fatalf("go bad response code: want %d, got %d", http.StatusOK, res.Code)
+		t.Fatalf(
+			"received incorrect status code: want %d, got %d",
+			http.StatusOK,
+			res.Code,
+		)
 	}
 
-	var got any
-	if err := json.Unmarshal(res.Body.Bytes(), &got); err != nil {
-		t.Fatalf("failed to unmarshal response: %v", err)
+	var got stremio.Manifest
+	if err := json.NewDecoder(res.Body).Decode(&got); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
 	}
 
-	wantJSON, _ := json.Marshal(stremio.NewManifest(stremio.ManifestConfig{
+	want := stremio.NewManifest(stremio.ManifestConfig{
 		ID:          testID,
 		Version:     testVersion,
 		Name:        testName,
 		Description: testDescription,
 		Logo:        testLogo,
 		CatalogName: testCatalogName,
-	}))
-
-	var want any
-	_ = json.Unmarshal(wantJSON, &want)
+	})
 
 	if !reflect.DeepEqual(got, want) {
-		t.Errorf("received incorrect manifest from response:\nwant %+v\ngot: %+v", want, got)
+		t.Errorf(
+			"received incorrect manifest:\nwant: %+v\ngot:  %+v",
+			want,
+			got,
+		)
 	}
 }

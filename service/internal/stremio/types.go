@@ -1,4 +1,4 @@
-// Types for the different meta objects StremIO expects.
+// Types for the different protocol types StremIO expects.
 // For example, Catalogs and Series.
 package stremio
 
@@ -18,18 +18,18 @@ type ManifestConfig struct {
 	CatalogName string
 }
 
-// Describes the StremIO manifest for anthologise.
+// Manifest is the StremIO manifest for Anthologise.
 // This contains all the plugin info:
 // https://stremio.github.io/stremio-addon-guide/step1
 type Manifest struct {
-	ID          string    `json:"id"`
-	Version     string    `json:"version"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Logo        string    `json:"logo"`
-	Resources   []any     `json:"resources"`
-	Types       []string  `json:"types"`
-	Catalogs    []Catalog `json:"catalogs"`
+	ID          string            `json:"id"`
+	Version     string            `json:"version"`
+	Name        string            `json:"name"`
+	Description string            `json:"description"`
+	Logo        string            `json:"logo"`
+	Resources   []Resource        `json:"resources"`
+	Types       []string          `json:"types"`
+	Catalogs    []ManifestCatalog `json:"catalogs"`
 }
 
 type Resource struct {
@@ -38,7 +38,8 @@ type Resource struct {
 	IDPrefixes []string `json:"idPrefixes,omitempty"`
 }
 
-type Catalog struct {
+// ManifestCatalog describes the catalogs available under a manifest.
+type ManifestCatalog struct {
 	ID   string `json:"id"`
 	Type string `json:"type"`
 	Name string `json:"name"`
@@ -51,9 +52,12 @@ func NewManifest(cfg ManifestConfig) Manifest {
 		Name:        cfg.Name,
 		Description: cfg.Description,
 		Logo:        cfg.Logo,
-		Resources: []any{
-			"catalog",
-			Resource{
+		Resources: []Resource{
+			{
+				Name:  "catalog",
+				Types: []string{seriesType},
+			},
+			{
 				Name:       "meta",
 				Types:      []string{seriesType},
 				IDPrefixes: []string{anthologyIDPrefix},
@@ -62,7 +66,7 @@ func NewManifest(cfg ManifestConfig) Manifest {
 		Types: []string{
 			seriesType,
 		},
-		Catalogs: []Catalog{
+		Catalogs: []ManifestCatalog{
 			{
 				ID:   catalogID,
 				Type: seriesType,
@@ -72,23 +76,30 @@ func NewManifest(cfg ManifestConfig) Manifest {
 	}
 }
 
-type Meta struct {
+// Catalog represents a collection of metas, in this case Anthologies
+type Catalog struct {
+	Metas []Anthology `json:"metas"`
 }
 
-// An Anthology acts as a series wrapper for vidios.
-type Anthology struct {
+// AnthologyPreview represents an anthology within a catalog
+type AnthologyPreview struct {
 	ID          string   `json:"id"`
 	Type        string   `json:"type"`
 	Name        string   `json:"name"`
-	Poster      string   `json:"poster,omitempty"`
+	Poster      string   `json:"poster"`
 	Description string   `json:"description,omitempty"`
 	Genres      []string `json:"genres,omitempty"`
-
-	Videos []Video `json:"videos,omitempty"`
 }
 
-// A video is the metadata for a single playable media instance.
-// ID is the IMDB for that episode or film.
+// Anthology acts as a series wrapper for videos, as well as the preview information.
+type Anthology struct {
+	AnthologyPreview
+
+	Videos []Video `json:"videos"`
+}
+
+// Video is the metadata for a single playable media instance.
+// ID any ID for that episode or film that Cinemata can look up.
 type Video struct {
 	ID       string `json:"id"`
 	Title    string `json:"title"`
