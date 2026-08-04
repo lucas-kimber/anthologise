@@ -10,11 +10,11 @@ import (
 	"github.com/lucas-kimber/anthologise/service/internal/stremio"
 )
 
-func TestGetCatalog(t *testing.T) {
+func TestGetAnthology(t *testing.T) {
 
 	router := newTestRouter(nil)
 
-	req := httptest.NewRequest(http.MethodGet, "/catalog/series/anthologise.json", nil)
+	req := httptest.NewRequest(http.MethodGet, "/manifest.json", nil)
 	res := httptest.NewRecorder()
 
 	router.ServeHTTP(res, req)

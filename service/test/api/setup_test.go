@@ -60,12 +60,23 @@ func newTestRouter(store api.Store) *gin.Engine {
 }
 
 func TestMain(m *testing.M) {
-
 	gin.SetMode(gin.TestMode)
-	os.Setenv("APP_ENV", "test")
-
 	slog.SetLogLoggerLevel(slog.LevelDebug)
 
-	exitCode := m.Run()
-	os.Exit(exitCode)
+	env := map[string]string{
+		"ANTHOLOGISE_STREMIO_ID":           testID,
+		"ANTHOLOGISE_VERSION_NUMBER":       testVersion,
+		"ANTHOLOGISE_APP_NAME":             testName,
+		"ANTHOLOGISE_MANIFEST_DESCRIPTION": testDescription,
+		"ANTHOLOGISE_LOGO_URL":             testLogo,
+		"ANTHOLOGISE_MAIN_CATALOG_NAME":    testCatalogName,
+	}
+
+	for key, value := range env {
+		if err := os.Setenv(key, value); err != nil {
+			panic(err)
+		}
+	}
+
+	os.Exit(m.Run())
 }

@@ -11,12 +11,6 @@ import (
 )
 
 func TestGetManifest(t *testing.T) {
-	t.Setenv("ANTHOLOGISE_STREMIO_ID", testID)
-	t.Setenv("ANTHOLOGISE_VERSION_NUMBER", testVersion)
-	t.Setenv("ANTHOLOGISE_APP_NAME", testName)
-	t.Setenv("ANTHOLOGISE_MANIFEST_DESCRIPTION", testDescription)
-	t.Setenv("ANTHOLOGISE_LOGO_URL", testLogo)
-	t.Setenv("ANTHOLOGISE_MAIN_CATALOG_NAME", testCatalogName)
 
 	router := newTestRouter(nil)
 
