@@ -45,3 +45,10 @@ tasks:
     desc: Run all the tests for the project
     cmds:
       - task: service:test
+
+  lint:
+    desc: Run all project linting.
+    cmds:
+      - task: service:lint
+      - cmd: echo "All lint checks passed"
+        silent: true
