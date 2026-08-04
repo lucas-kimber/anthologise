@@ -14,7 +14,7 @@ func TestGetAnthology(t *testing.T) {
 
 	router := newTestRouter(nil)
 
-	req := httptest.NewRequest(http.MethodGet, "/manifest.json", nil)
+	req := httptest.NewRequest(http.MethodGet, "/token/manifest.json", nil)
 	res := httptest.NewRecorder()
 
 	router.ServeHTTP(res, req)

@@ -22,6 +22,19 @@ type MemoryStore struct {
 
 var _ api.Store = (*MemoryStore)(nil)
 
+func NewMemoryStore() *MemoryStore {
+	return &MemoryStore{
+		catalogs:    make(map[catalogKey]stremio.Catalog),
+		anthologies: make(map[anthologyKey]stremio.Anthology),
+	}
+}
+
+func (s *MemoryStore) AddCatalog(token string, catalogID string, catalog stremio.Catalog) {
+
+	k := catalogKey{token, catalogID}
+	s.catalogs[k] = catalog
+}
+
 func (s *MemoryStore) GetCatalog(token string, catalogID string) (stremio.Catalog, error) {
 
 	k := catalogKey{token, catalogID}
