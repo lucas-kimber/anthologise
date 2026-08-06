@@ -1,5 +1,11 @@
 # Anthologise
 
+Anthologise is an early-stage Stremio add-on that for combine films and episodes from different series into custom, ordered anthologie, that show up as Series in Stremio.
+
+## Status
+
+Currently under development. The initial Stremio endpoints and service structure are in place, but anthology creation and persistent storage are not yet implemented.
+
 ## Dev Info
 
 ### Running the Project
