@@ -78,7 +78,7 @@ func NewManifest(cfg ManifestConfig) Manifest {
 
 // Catalog represents a collection of metas, in this case Anthologies
 type Catalog struct {
-	Metas []Anthology `json:"metas"`
+	Metas []AnthologyPreview `json:"metas"`
 }
 
 // AnthologyPreview represents an anthology within a catalog

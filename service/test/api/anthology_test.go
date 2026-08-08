@@ -7,14 +7,41 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/lucas-kimber/anthologise/service/internal/store"
 	"github.com/lucas-kimber/anthologise/service/internal/stremio"
 )
 
 func TestGetAnthology(t *testing.T) {
 
-	router := newTestRouter(nil)
+	const token = "testtoken"
 
-	req := httptest.NewRequest(http.MethodGet, "/token/manifest.json", nil)
+	want := stremio.Anthology{
+		AnthologyPreview: stremio.AnthologyPreview{
+			ID:          "testid",
+			Type:        "series",
+			Name:        "Test Anthology",
+			Poster:      "Test PosterURL",
+			Description: "Test Description",
+			Genres:      []string{"Test"},
+		},
+		Videos: []stremio.Video{
+			{
+				ID:       "test_video",
+				Title:    "Test Video",
+				Season:   1,
+				Episode:  1,
+				Released: "Test Released",
+				Overview: "Test Overview",
+			},
+		},
+	}
+
+	s := store.NewMemoryStore()
+	s.AddAnthology(token, want)
+
+	router := newTestRouter(s)
+
+	req := httptest.NewRequest(http.MethodGet, "/testtoken/meta/series/testid", nil)
 	res := httptest.NewRecorder()
 
 	router.ServeHTTP(res, req)
@@ -27,23 +54,14 @@ func TestGetAnthology(t *testing.T) {
 		)
 	}
 
-	var got stremio.Manifest
+	var got stremio.Anthology
 	if err := json.NewDecoder(res.Body).Decode(&got); err != nil {
 		t.Fatalf("failed to decode response: %v", err)
 	}
 
-	want := stremio.NewManifest(stremio.ManifestConfig{
-		ID:          testID,
-		Version:     testVersion,
-		Name:        testName,
-		Description: testDescription,
-		Logo:        testLogo,
-		CatalogName: testCatalogName,
-	})
-
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf(
-			"received incorrect manifest:\nwant: %+v\ngot:  %+v",
+			"received incorrect anthology:\nwant: %+v\ngot:  %+v",
 			want,
 			got,
 		)
