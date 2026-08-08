@@ -21,7 +21,9 @@ func NewRouter(manifest stremio.Manifest, store Store, middleware ...gin.Handler
 
 	r.GET("/:token/manifest.json", server.getManifest)
 	r.GET("/:token/catalog/:type/:id", server.getCatalog)
-	r.GET("/:token/meta/:type/:id", server.getMeta)
+	r.GET("/:token/meta/:type/:id", server.getAnthology)
+
+	r.POST("/:token/anthologies", server.addAnthology)
 
 	return r
 }
