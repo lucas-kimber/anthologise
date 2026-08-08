@@ -48,7 +48,7 @@ func (s *MemoryStore) ensureCatalog(token string) stremio.Catalog {
 	return c
 }
 
-func (s *MemoryStore) AddAnthology(token string, anthology stremio.Anthology) error {
+func (s *MemoryStore) AddAnthology(token string, anthology stremio.Anthology) {
 
 	c := s.ensureCatalog(token)
 	c.Metas = append(c.Metas, anthology.AnthologyPreview)
@@ -58,7 +58,6 @@ func (s *MemoryStore) AddAnthology(token string, anthology stremio.Anthology) er
 	ak := anthologyKey{token, anthology.ID}
 	s.anthologies[ak] = anthology
 
-	return nil
 }
 
 func (s *MemoryStore) GetCatalog(token string) stremio.Catalog {

@@ -12,5 +12,6 @@ var ErrAnthologyNotFound = errors.New("anthology item not found")
 // Store defines the methods that the API handlers expect to be available for retreiving resources from the database
 type Store interface {
 	GetCatalog(token string) stremio.Catalog
-	GetAnthology(token string, catalogID string) (stremio.Anthology, error)
+	GetAnthology(token string, anthologyID string) (stremio.Anthology, error)
+	AddAnthology(token string, anthology stremio.Anthology)
 }
