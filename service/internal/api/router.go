@@ -24,6 +24,7 @@ func NewRouter(manifest stremio.Manifest, store Store, middleware ...gin.Handler
 	r.GET("/:token/meta/:type/:id", server.getAnthology)
 
 	r.POST("/:token/anthologies", server.addAnthology)
+	r.PUT("/:token/anthologies", server.updateAnthology)
 
 	return r
 }

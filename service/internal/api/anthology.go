@@ -1,6 +1,7 @@
 package api
 
 import (
+	"crypto/rand"
 	"log/slog"
 	"net/http"
 
@@ -35,7 +36,33 @@ func (s *server) addAnthology(c *gin.Context) {
 		return
 	}
 
+	id := stremio.AnthologyIDPrefix + rand.Text()
+	anthology.ID = id
+
 	s.store.AddAnthology(token, anthology)
 
-	c.Status(http.StatusCreated)
+	c.JSON(http.StatusCreated, anthology)
+}
+
+func (s *server) updateAnthology(c *gin.Context) {
+
+	token := c.Param("token")
+
+	var anthology stremio.Anthology
+
+	if err := c.ShouldBindJSON(&anthology); err != nil {
+
+		slog.Debug("invalid anthology request", "error", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid anthology"})
+		return
+	}
+
+	if err := s.store.UpdateAnthology(token, anthology); err != nil {
+
+		slog.Info("failed to find anthology", "id", anthology.ID)
+		c.JSON(http.StatusNotFound, gin.H{"error": "anthology not found"})
+		return
+	}
+
+	c.Status(http.StatusOK)
 }

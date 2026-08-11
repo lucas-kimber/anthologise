@@ -5,7 +5,7 @@ package stremio
 const (
 	MainCatalogID     = "anthologise"
 	catalogName       = "My Anthologise"
-	anthologyIDPrefix = "anthologies_"
+	AnthologyIDPrefix = "anthologies_"
 	seriesType        = "series"
 )
 
@@ -60,7 +60,7 @@ func NewManifest(cfg ManifestConfig) Manifest {
 			{
 				Name:       "meta",
 				Types:      []string{seriesType},
-				IDPrefixes: []string{anthologyIDPrefix},
+				IDPrefixes: []string{AnthologyIDPrefix},
 			},
 		},
 		Types: []string{

@@ -75,3 +75,20 @@ func (s *MemoryStore) GetAnthology(token string, anthologyID string) (stremio.An
 
 	return a, nil
 }
+
+func (s *MemoryStore) UpdateAnthology(token string, anthology stremio.Anthology) error {
+
+	ak := anthologyKey{token, anthology.ID}
+
+	if _, ok := s.anthologies[ak]; !ok {
+		return api.ErrAnthologyNotFound
+	}
+
+	c := s.ensureCatalog(token)
+	c.Metas = append(c.Metas, anthology.AnthologyPreview)
+
+	s.catalogs[token] = c
+
+	s.anthologies[ak] = anthology
+	return nil
+}

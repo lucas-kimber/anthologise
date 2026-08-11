@@ -14,4 +14,5 @@ type Store interface {
 	GetCatalog(token string) stremio.Catalog
 	GetAnthology(token string, anthologyID string) (stremio.Anthology, error)
 	AddAnthology(token string, anthology stremio.Anthology)
+	UpdateAnthology(token string, anthology stremio.Anthology) error
 }
