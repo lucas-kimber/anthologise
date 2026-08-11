@@ -12,6 +12,7 @@ import (
 )
 
 const (
+	testToken       = "testtoken"
 	testID          = "testid"
 	testVersion     = "testversion"
 	testName        = "testname"
@@ -21,31 +22,7 @@ const (
 )
 
 func newTestRouter(store api.Store) *gin.Engine {
-
 	cfg := config.LoadViper()
-
-	l := config.ConfigureSlog(cfg.Log)
-	slog.SetDefault(l)
-
-	l.Info("logger initialised")
-
-	slog.Info(
-		"config found and set",
-		slog.Group(
-			"app",
-			"stremio_id", cfg.App.StremioID,
-			"version", cfg.App.Version,
-			"name", cfg.App.Name,
-			"description", cfg.App.Description,
-			"logo_url", cfg.App.LogoURL,
-			"main_catalog_name", cfg.App.MainCatalogName,
-		),
-		slog.Group(
-			"log",
-			"format_json", cfg.Log.FormatJSON,
-			"level", cfg.Log.Level,
-		),
-	)
 
 	manifest := stremio.NewManifest(stremio.ManifestConfig{
 		ID:          cfg.App.StremioID,
@@ -61,7 +38,6 @@ func newTestRouter(store api.Store) *gin.Engine {
 
 func TestMain(m *testing.M) {
 	gin.SetMode(gin.TestMode)
-	slog.SetLogLoggerLevel(slog.LevelDebug)
 
 	env := map[string]string{
 		"ANTHOLOGISE_STREMIO_ID":           testID,
@@ -77,6 +53,9 @@ func TestMain(m *testing.M) {
 			panic(err)
 		}
 	}
+
+	cfg := config.LoadViper()
+	slog.SetDefault(config.ConfigureSlog(cfg.Log))
 
 	os.Exit(m.Run())
 }

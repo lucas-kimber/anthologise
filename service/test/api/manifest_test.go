@@ -1,9 +1,6 @@
 package api_test
 
 import (
-	"encoding/json"
-	"net/http"
-	"net/http/httptest"
 	"reflect"
 	"testing"
 
@@ -11,26 +8,13 @@ import (
 )
 
 func TestGetManifest(t *testing.T) {
-
 	router := newTestRouter(nil)
 
-	req := httptest.NewRequest(http.MethodGet, "/token/manifest.json", nil)
-	res := httptest.NewRecorder()
-
-	router.ServeHTTP(res, req)
-
-	if res.Code != http.StatusOK {
-		t.Fatalf(
-			"received incorrect status code: want %d, got %d",
-			http.StatusOK,
-			res.Code,
-		)
-	}
-
-	var got stremio.Manifest
-	if err := json.NewDecoder(res.Body).Decode(&got); err != nil {
-		t.Fatalf("failed to decode response: %v", err)
-	}
+	got := getJSON[stremio.Manifest](
+		t,
+		router,
+		"/token/manifest.json",
+	)
 
 	want := stremio.NewManifest(stremio.ManifestConfig{
 		ID:          testID,
