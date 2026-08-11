@@ -39,7 +39,8 @@ func (s *server) addAnthology(c *gin.Context) {
 	id := stremio.AnthologyIDPrefix + rand.Text()
 	anthology.ID = id
 
-	s.store.AddAnthology(token, anthology)
+	s.store.CreateAnthology(token, anthology)
+	s.store.AddAnthologyToCatalog(token, anthology.ID)
 
 	c.JSON(http.StatusCreated, anthology)
 }
