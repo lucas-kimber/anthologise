@@ -13,7 +13,7 @@ func TestGetManifest(t *testing.T) {
 	got := getJSON[stremio.Manifest](
 		t,
 		router,
-		"/token/manifest.json",
+		"/userID/manifest.json",
 	)
 
 	want := stremio.NewManifest(stremio.ManifestConfig{

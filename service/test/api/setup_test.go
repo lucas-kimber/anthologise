@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	testToken       = "testtoken"
+	testUserID      = "testUserID"
 	testID          = "testid"
 	testVersion     = "testversion"
 	testName        = "testname"

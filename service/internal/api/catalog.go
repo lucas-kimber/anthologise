@@ -8,6 +8,6 @@ import (
 
 func (s *server) getCatalog(c *gin.Context) {
 
-	token := c.Param("token")
+	token := c.Param("userID")
 	c.JSON(http.StatusOK, s.store.GetCatalog(token))
 }
