@@ -44,7 +44,7 @@ func setEditTokenCookie(c *gin.Context, editToken string) {
 	)
 }
 
-func (s *server) CreateUser(c *gin.Context) {
+func (s *server) createUser(c *gin.Context) {
 
 	newID := createUserID()
 	editToken, tokenHash := createEditToken()

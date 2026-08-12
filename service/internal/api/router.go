@@ -24,6 +24,9 @@ func NewRouter(manifest stremio.Manifest, store Store, middleware ...gin.Handler
 	r.GET("/:userID/catalog/:type/:anthologyID", server.getCatalog)
 	r.GET("/:userID/meta/:type/:anthologyID", server.getAnthology)
 
+	// Config site facing routes
+	r.POST("/api/user/", server.createUser)
+
 	// Private api routes
 	private := r.Group("/api/:userID")
 	private.Use(server.authMiddleware())

@@ -133,9 +133,11 @@ func TestAddAnthology(t *testing.T) {
 	)
 
 	s := store.NewMemoryStore()
+	seedUser(t, s)
+
 	router := newTestRouter(s)
 
-	res := jsonRequest(
+	res := authenticatedJSONRequest(
 		t,
 		router,
 		http.MethodPost,
@@ -192,11 +194,12 @@ func TestUpdateAnthology(t *testing.T) {
 
 	s := store.NewMemoryStore()
 
+	seedUser(t, s)
 	seedCatalog(t, s, original)
 
 	router := newTestRouter(s)
 
-	res := jsonRequest(
+	res := authenticatedJSONRequest(
 		t,
 		router,
 		http.MethodPut,
@@ -237,9 +240,11 @@ func TestUpdateAnthologyNotFound(t *testing.T) {
 	anthology := testAnthology("missing", "Missing Anthology")
 
 	s := store.NewMemoryStore()
+	seedUser(t, s)
+
 	router := newTestRouter(s)
 
-	res := jsonRequest(
+	res := authenticatedJSONRequest(
 		t,
 		router,
 		http.MethodPut,
@@ -268,9 +273,11 @@ func TestAnthologyInvalidJSON(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := store.NewMemoryStore()
+			seedUser(t, s)
+
 			router := newTestRouter(s)
 
-			res := request(
+			res := authenticatedRequest(
 				t,
 				router,
 				tt.method,
