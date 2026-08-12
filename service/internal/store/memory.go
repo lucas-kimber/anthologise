@@ -10,6 +10,7 @@ import (
 )
 
 type MemoryStore struct {
+	users       map[string][32]byte
 	catalogs    map[string]map[string]struct{}
 	anthologies map[string]stremio.Anthology
 }
@@ -18,6 +19,7 @@ var _ api.Store = (*MemoryStore)(nil)
 
 func NewMemoryStore() *MemoryStore {
 	return &MemoryStore{
+		users:       make(map[string][32]byte),
 		catalogs:    make(map[string]map[string]struct{}),
 		anthologies: make(map[string]stremio.Anthology),
 	}
@@ -114,10 +116,25 @@ func (s *MemoryStore) UpdateAnthology(userID string, anthology stremio.Anthology
 	return nil
 }
 
-func (s *MemoryStore) CreateUser(userID string, editTokenHash [32]byte) {
+func (s *MemoryStore) CreateUser(userID string, editTokenHash [32]byte) error {
+
+	if _, exists := s.users[userID]; exists {
+		return api.ErrUserAlreadyExists
+	}
+
+	s.users[userID] = editTokenHash
+
+	return nil
 }
 
 func (s *MemoryStore) GetTokenHash(userID string) ([32]byte, error) {
-	var b [32]byte
-	return b, nil
+
+	tokenHash, ok := s.users[userID]
+
+	if !ok {
+		var b [32]byte
+		return b, api.ErrUserDoesNotExist
+	}
+
+	return tokenHash, nil
 }

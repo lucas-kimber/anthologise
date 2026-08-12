@@ -19,12 +19,17 @@ func NewRouter(manifest stremio.Manifest, store Store, middleware ...gin.Handler
 
 	server := newServer(manifest, store)
 
+	// Public stremio routes
 	r.GET("/:userID/manifest.json", server.getManifest)
 	r.GET("/:userID/catalog/:type/:anthologyID", server.getCatalog)
 	r.GET("/:userID/meta/:type/:anthologyID", server.getAnthology)
 
-	r.POST("/api/:userID/anthologies", server.addAnthology)
-	r.PUT("/api/:userID/anthologies", server.updateAnthology)
+	// Private api routes
+	private := r.Group("/api/:userID")
+	private.Use(server.authMiddleware())
+
+	private.POST("/anthologies", server.addAnthology)
+	private.PUT("/anthologies", server.updateAnthology)
 
 	return r
 }
