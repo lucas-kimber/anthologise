@@ -30,6 +30,55 @@ func request(
 	return res
 }
 
+func authenticatedRequest(
+	t *testing.T,
+	handler http.Handler,
+	method string,
+	path string,
+	body io.Reader,
+) *httptest.ResponseRecorder {
+	t.Helper()
+
+	req := httptest.NewRequest(method, path, body)
+
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
+
+	req.AddCookie(&http.Cookie{
+		Name:  "__Host-anthologise_edit_token",
+		Value: testEditToken,
+	})
+
+	res := httptest.NewRecorder()
+	handler.ServeHTTP(res, req)
+
+	return res
+}
+
+func authenticatedJSONRequest(
+	t *testing.T,
+	handler http.Handler,
+	method string,
+	path string,
+	body any,
+) *httptest.ResponseRecorder {
+	t.Helper()
+
+	data, err := json.Marshal(body)
+	if err != nil {
+		t.Fatalf("failed to encode request body: %v", err)
+	}
+
+	return authenticatedRequest(
+		t,
+		handler,
+		method,
+		path,
+		bytes.NewReader(data),
+	)
+}
+
 func jsonRequest(
 	t *testing.T,
 	handler http.Handler,

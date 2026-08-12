@@ -10,6 +10,7 @@ import (
 )
 
 type MemoryStore struct {
+	users       map[string][32]byte
 	catalogs    map[string]map[string]struct{}
 	anthologies map[string]stremio.Anthology
 }
@@ -18,17 +19,18 @@ var _ api.Store = (*MemoryStore)(nil)
 
 func NewMemoryStore() *MemoryStore {
 	return &MemoryStore{
+		users:       make(map[string][32]byte),
 		catalogs:    make(map[string]map[string]struct{}),
 		anthologies: make(map[string]stremio.Anthology),
 	}
 }
 
-func (s *MemoryStore) ensureCatalog(token string) map[string]struct{} {
-	c, ok := s.catalogs[token]
+func (s *MemoryStore) ensureCatalog(userID string) map[string]struct{} {
+	c, ok := s.catalogs[userID]
 
 	if !ok {
 		c = make(map[string]struct{})
-		s.catalogs[token] = c
+		s.catalogs[userID] = c
 
 		slog.Info("created empty catalog")
 	}
@@ -36,7 +38,7 @@ func (s *MemoryStore) ensureCatalog(token string) map[string]struct{} {
 	return c
 }
 
-func (s *MemoryStore) GetAnthology(token string, anthologyID string) (stremio.Anthology, error) {
+func (s *MemoryStore) GetAnthology(anthologyID string) (stremio.Anthology, error) {
 
 	a, ok := s.anthologies[anthologyID]
 
@@ -47,8 +49,8 @@ func (s *MemoryStore) GetAnthology(token string, anthologyID string) (stremio.An
 	return a, nil
 }
 
-func (s *MemoryStore) GetCatalog(token string) stremio.Catalog {
-	c := s.ensureCatalog(token)
+func (s *MemoryStore) GetCatalog(userID string) stremio.Catalog {
+	c := s.ensureCatalog(userID)
 
 	metas := make([]stremio.AnthologyPreview, 0, len(c))
 
@@ -70,19 +72,19 @@ func (s *MemoryStore) GetCatalog(token string) stremio.Catalog {
 	}
 }
 
-func (s *MemoryStore) AddAnthologyToCatalog(token string, anthologyID string) error {
+func (s *MemoryStore) AddAnthologyToCatalog(userID string, anthologyID string) error {
 	if _, ok := s.anthologies[anthologyID]; !ok {
 		return api.ErrAnthologyNotFound
 	}
 
-	c := s.ensureCatalog(token)
+	c := s.ensureCatalog(userID)
 	c[anthologyID] = struct{}{}
 
 	return nil
 }
 
-func (s *MemoryStore) RemoveAnthologyFromCatalog(token string, anthologyID string) error {
-	c := s.ensureCatalog(token)
+func (s *MemoryStore) RemoveAnthologyFromCatalog(userID string, anthologyID string) error {
+	c := s.ensureCatalog(userID)
 
 	if _, ok := c[anthologyID]; !ok {
 		return api.ErrAnthologyNotInCatalog
@@ -93,7 +95,7 @@ func (s *MemoryStore) RemoveAnthologyFromCatalog(token string, anthologyID strin
 	return nil
 }
 
-func (s *MemoryStore) CreateAnthology(token string, anthology stremio.Anthology) error {
+func (s *MemoryStore) CreateAnthology(userID string, anthology stremio.Anthology) error {
 
 	if _, exists := s.anthologies[anthology.ID]; exists {
 		return api.ErrAnthologyAlreadyExists
@@ -104,7 +106,7 @@ func (s *MemoryStore) CreateAnthology(token string, anthology stremio.Anthology)
 	return nil
 }
 
-func (s *MemoryStore) UpdateAnthology(token string, anthology stremio.Anthology) error {
+func (s *MemoryStore) UpdateAnthology(userID string, anthology stremio.Anthology) error {
 	if _, ok := s.anthologies[anthology.ID]; !ok {
 		return api.ErrAnthologyNotFound
 	}
@@ -112,4 +114,27 @@ func (s *MemoryStore) UpdateAnthology(token string, anthology stremio.Anthology)
 	s.anthologies[anthology.ID] = anthology
 
 	return nil
+}
+
+func (s *MemoryStore) CreateUser(userID string, editTokenHash [32]byte) error {
+
+	if _, exists := s.users[userID]; exists {
+		return api.ErrUserAlreadyExists
+	}
+
+	s.users[userID] = editTokenHash
+
+	return nil
+}
+
+func (s *MemoryStore) GetTokenHash(userID string) ([32]byte, error) {
+
+	tokenHash, ok := s.users[userID]
+
+	if !ok {
+		var b [32]byte
+		return b, api.ErrUserDoesNotExist
+	}
+
+	return tokenHash, nil
 }

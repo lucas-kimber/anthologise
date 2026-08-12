@@ -1,6 +1,7 @@
 package api_test
 
 import (
+	"crypto/sha256"
 	"log/slog"
 	"os"
 	"testing"
@@ -8,11 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lucas-kimber/anthologise/service/internal/api"
 	"github.com/lucas-kimber/anthologise/service/internal/config"
+	"github.com/lucas-kimber/anthologise/service/internal/store"
 	"github.com/lucas-kimber/anthologise/service/internal/stremio"
 )
 
 const (
-	testToken       = "testtoken"
+	testUserID      = "testUserID"
+	testEditToken   = "testEditToken"
 	testID          = "testid"
 	testVersion     = "testversion"
 	testName        = "testname"
@@ -34,6 +37,16 @@ func newTestRouter(store api.Store) *gin.Engine {
 	})
 
 	return api.NewRouter(manifest, store)
+}
+
+func seedUser(t *testing.T, s *store.MemoryStore) {
+	t.Helper()
+
+	tokenHash := sha256.Sum256([]byte(testEditToken))
+
+	if err := s.CreateUser(testUserID, tokenHash); err != nil {
+		t.Fatalf("failed to create test user: %v", err)
+	}
 }
 
 func TestMain(m *testing.M) {

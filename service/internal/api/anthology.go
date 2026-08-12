@@ -11,12 +11,11 @@ import (
 
 func (s *server) getAnthology(c *gin.Context) {
 
-	token := c.Param("token")
-	id := c.Param("id")
+	anthologyID := c.Param("anthologyID")
 
-	anthology, err := s.store.GetAnthology(token, id)
+	anthology, err := s.store.GetAnthology(anthologyID)
 	if err != nil {
-		slog.Error("failed to find anthology", "id", id)
+		slog.Error("failed to find anthology", "id", anthologyID)
 		c.JSON(http.StatusNotFound, gin.H{"error": "anthology not found"})
 		return
 	}
@@ -26,7 +25,7 @@ func (s *server) getAnthology(c *gin.Context) {
 
 func (s *server) addAnthology(c *gin.Context) {
 
-	token := c.Param("token")
+	userID := c.Param("userID")
 
 	var anthology stremio.Anthology
 
@@ -39,15 +38,15 @@ func (s *server) addAnthology(c *gin.Context) {
 	id := stremio.AnthologyIDPrefix + rand.Text()
 	anthology.ID = id
 
-	s.store.CreateAnthology(token, anthology)
-	s.store.AddAnthologyToCatalog(token, anthology.ID)
+	s.store.CreateAnthology(userID, anthology)
+	s.store.AddAnthologyToCatalog(userID, anthology.ID)
 
 	c.JSON(http.StatusCreated, anthology)
 }
 
 func (s *server) updateAnthology(c *gin.Context) {
 
-	token := c.Param("token")
+	userID := c.Param("userID")
 
 	var anthology stremio.Anthology
 
@@ -58,7 +57,7 @@ func (s *server) updateAnthology(c *gin.Context) {
 		return
 	}
 
-	if err := s.store.UpdateAnthology(token, anthology); err != nil {
+	if err := s.store.UpdateAnthology(userID, anthology); err != nil {
 
 		slog.Info("failed to find anthology", "id", anthology.ID)
 		c.JSON(http.StatusNotFound, gin.H{"error": "anthology not found"})
