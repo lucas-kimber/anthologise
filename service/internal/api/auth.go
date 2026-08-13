@@ -3,7 +3,6 @@ package api
 import (
 	"crypto/rand"
 	"crypto/sha256"
-	"crypto/subtle"
 	"encoding/base64"
 	"log/slog"
 	"net/http"
@@ -42,36 +41,6 @@ func setEditTokenCookie(c *gin.Context, editToken string) {
 		true,
 		true,
 	)
-}
-
-func (s *server) createUser(c *gin.Context) {
-
-	newID := createUserID()
-	editToken, tokenHash := createEditToken()
-
-	if err := s.store.CreateUser(newID, tokenHash); err != nil {
-
-		slog.Error("failed to create user", "error", err)
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
-
-	setEditTokenCookie(c, editToken)
-
-	c.JSON(http.StatusCreated, gin.H{"userID": newID})
-}
-
-func (s *server) verifyUser(userID, editToken string) (bool, error) {
-
-	targetHash, err := s.store.GetTokenHash(userID)
-
-	if err != nil {
-		return false, err
-	}
-
-	givenHash := sha256.Sum256([]byte(editToken))
-
-	return subtle.ConstantTimeCompare(targetHash[:], givenHash[:]) == 1, nil
 }
 
 func (s *server) authMiddleware() gin.HandlerFunc {
