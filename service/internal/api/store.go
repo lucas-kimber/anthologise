@@ -24,4 +24,5 @@ type Store interface {
 	CreateAnthology(userID string, anthology stremio.Anthology) error
 	UpdateAnthology(userID string, anthology stremio.Anthology) error
 	AddAnthologyToCatalog(userID string, anthologyID string) error
+	RemoveAnthologyFromCatalog(userID string, anthologyID string) error
 }
