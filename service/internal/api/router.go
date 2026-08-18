@@ -32,8 +32,6 @@ func NewRouter(manifest stremio.Manifest, store Store, middleware ...gin.Handler
 	private.Use(server.authMiddleware())
 
 	private.POST("/anthologies", server.addAnthology)
-	private.PUT("/anthologies", server.updateAnthology)
-
 	private.PUT("/catalog/:anthologyID", server.addAnthologyToCatalog)
 	private.DELETE("/catalog/:anthologyID", server.removeAnthologyFromCatalog)
 

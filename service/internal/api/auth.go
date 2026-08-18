@@ -3,6 +3,7 @@ package api
 import (
 	"crypto/rand"
 	"crypto/sha256"
+	"crypto/subtle"
 	"encoding/base64"
 	"log/slog"
 	"net/http"
@@ -53,9 +54,18 @@ func (s *server) authMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		valid, err := s.verifyUser(userID, editToken)
+		targetHash, err := s.store.GetTokenHash(c.Request.Context(), userID)
 
-		if !valid || err != nil {
+		if err != nil {
+			slog.Debug("user authentication failed", "userID", userID, "error", err)
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+
+		givenHash := sha256.Sum256([]byte(editToken))
+		valid := subtle.ConstantTimeCompare(targetHash[:], givenHash[:]) == 1
+
+		if !valid {
 			slog.Debug("user authentication failed", "userID", userID, "error", err)
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return

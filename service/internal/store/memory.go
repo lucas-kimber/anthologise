@@ -2,6 +2,7 @@ package store
 
 import (
 	"cmp"
+	"context"
 	"log/slog"
 	"slices"
 
@@ -38,7 +39,7 @@ func (s *MemoryStore) ensureCatalog(userID string) map[string]struct{} {
 	return c
 }
 
-func (s *MemoryStore) GetAnthology(anthologyID string) (stremio.Anthology, error) {
+func (s *MemoryStore) GetAnthology(ctx context.Context, anthologyID string) (stremio.Anthology, error) {
 
 	a, ok := s.anthologies[anthologyID]
 
@@ -49,7 +50,7 @@ func (s *MemoryStore) GetAnthology(anthologyID string) (stremio.Anthology, error
 	return a, nil
 }
 
-func (s *MemoryStore) GetCatalog(userID string) stremio.Catalog {
+func (s *MemoryStore) GetCatalog(ctx context.Context, userID string) (stremio.Catalog, error) {
 	c := s.ensureCatalog(userID)
 
 	metas := make([]stremio.AnthologyPreview, 0, len(c))
@@ -69,10 +70,10 @@ func (s *MemoryStore) GetCatalog(userID string) stremio.Catalog {
 
 	return stremio.Catalog{
 		Metas: metas,
-	}
+	}, nil
 }
 
-func (s *MemoryStore) AddAnthologyToCatalog(userID string, anthologyID string) error {
+func (s *MemoryStore) AddAnthologyToCatalog(ctx context.Context, userID string, anthologyID string) error {
 	if _, ok := s.anthologies[anthologyID]; !ok {
 		return api.ErrAnthologyNotFound
 	}
@@ -83,7 +84,7 @@ func (s *MemoryStore) AddAnthologyToCatalog(userID string, anthologyID string) e
 	return nil
 }
 
-func (s *MemoryStore) RemoveAnthologyFromCatalog(userID string, anthologyID string) error {
+func (s *MemoryStore) RemoveAnthologyFromCatalog(ctx context.Context, userID string, anthologyID string) error {
 	c := s.ensureCatalog(userID)
 
 	if _, ok := c[anthologyID]; !ok {
@@ -95,7 +96,7 @@ func (s *MemoryStore) RemoveAnthologyFromCatalog(userID string, anthologyID stri
 	return nil
 }
 
-func (s *MemoryStore) CreateAnthology(userID string, anthology stremio.Anthology) error {
+func (s *MemoryStore) CreateAnthology(ctx context.Context, anthology stremio.Anthology) error {
 
 	if _, exists := s.anthologies[anthology.ID]; exists {
 		return api.ErrAnthologyAlreadyExists
@@ -106,7 +107,7 @@ func (s *MemoryStore) CreateAnthology(userID string, anthology stremio.Anthology
 	return nil
 }
 
-func (s *MemoryStore) UpdateAnthology(userID string, anthology stremio.Anthology) error {
+func (s *MemoryStore) UpdateAnthology(ctx context.Context, userID string, anthology stremio.Anthology) error {
 	if _, ok := s.anthologies[anthology.ID]; !ok {
 		return api.ErrAnthologyNotFound
 	}
@@ -116,7 +117,7 @@ func (s *MemoryStore) UpdateAnthology(userID string, anthology stremio.Anthology
 	return nil
 }
 
-func (s *MemoryStore) CreateUser(userID string, editTokenHash [32]byte) error {
+func (s *MemoryStore) CreateUser(ctx context.Context, userID string, editTokenHash [32]byte) error {
 
 	if _, exists := s.users[userID]; exists {
 		return api.ErrUserAlreadyExists
@@ -127,7 +128,7 @@ func (s *MemoryStore) CreateUser(userID string, editTokenHash [32]byte) error {
 	return nil
 }
 
-func (s *MemoryStore) GetTokenHash(userID string) ([32]byte, error) {
+func (s *MemoryStore) GetTokenHash(ctx context.Context, userID string) ([32]byte, error) {
 
 	tokenHash, ok := s.users[userID]
 
