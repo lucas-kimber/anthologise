@@ -1,13 +1,13 @@
 package api
 
 import (
-	"crypto/rand"
 	"crypto/sha256"
 	"crypto/subtle"
 	"log/slog"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/lucas-kimber/anthologise/service/internal/stremio"
 )
 
@@ -40,6 +40,7 @@ func (s *server) verifyUser(userID, editToken string) (bool, error) {
 
 	return subtle.ConstantTimeCompare(targetHash[:], givenHash[:]) == 1, nil
 }
+
 func (s *server) addAnthology(c *gin.Context) {
 
 	userID := c.Param("userID")
@@ -52,7 +53,7 @@ func (s *server) addAnthology(c *gin.Context) {
 		return
 	}
 
-	id := stremio.AnthologyIDPrefix + rand.Text()
+	id := stremio.AnthologyIDPrefix + "_" + uuid.NewString()
 	anthology.ID = id
 
 	s.store.CreateAnthology(userID, anthology)
