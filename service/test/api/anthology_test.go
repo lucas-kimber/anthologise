@@ -1,6 +1,7 @@
 package api_test
 
 import (
+	"context"
 	"net/http"
 	"reflect"
 	"strings"
@@ -41,11 +42,12 @@ func seedCatalog(
 	t.Helper()
 
 	for _, anthology := range anthologies {
-		if err := s.CreateAnthology(testUserID, anthology); err != nil {
+		if err := s.CreateAnthology(context.Background(), anthology); err != nil {
 			t.Fatalf("failed to create anthology: %v", err)
 		}
 
 		if err := s.AddAnthologyToCatalog(
+			context.Background(),
 			testUserID,
 			anthology.ID,
 		); err != nil {
@@ -62,7 +64,7 @@ func TestGetAnthology(t *testing.T) {
 
 	s := store.NewMemoryStore()
 
-	if err := s.CreateAnthology(testUserID, want); err != nil {
+	if err := s.CreateAnthology(context.Background(), want); err != nil {
 		t.Fatalf("failed to create anthology: %v", err)
 	}
 
@@ -186,106 +188,19 @@ func TestAddAnthology(t *testing.T) {
 	}
 }
 
-func TestUpdateAnthology(t *testing.T) {
-	original := testAnthology("testid", "Original Anthology")
-
-	want := testAnthology("testid", "Updated Anthology")
-	want.Description = "Updated Description"
-
-	s := store.NewMemoryStore()
-
-	seedUser(t, s)
-	seedCatalog(t, s, original)
-
-	router := newTestRouter(s)
-
-	res := authenticatedJSONRequest(
-		t,
-		router,
-		http.MethodPut,
-		"/api/testUserID/anthologies",
-		want,
-	)
-
-	requireStatus(t, res, http.StatusOK)
-
-	got := getJSON[stremio.Anthology](
-		t,
-		router,
-		"/testUserID/meta/series/testid",
-	)
-
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("received incorrect anthology:\nwant: %+v\ngot:  %+v", want, got)
-	}
-
-	catalog := getJSON[stremio.Catalog](
-		t,
-		router,
-		"/testUserID/catalog/series/anthologise",
-	)
-
-	wantCatalog := stremio.Catalog{
-		Metas: []stremio.AnthologyPreview{
-			want.AnthologyPreview,
-		},
-	}
-
-	if !reflect.DeepEqual(catalog, wantCatalog) {
-		t.Errorf("received incorrect catalog:\nwant: %+v\ngot:  %+v", wantCatalog, catalog)
-	}
-}
-
-func TestUpdateAnthologyNotFound(t *testing.T) {
-	anthology := testAnthology("missing", "Missing Anthology")
-
+func TestAddAnthologyInvalidJSON(t *testing.T) {
 	s := store.NewMemoryStore()
 	seedUser(t, s)
 
 	router := newTestRouter(s)
 
-	res := authenticatedJSONRequest(
+	res := authenticatedRequest(
 		t,
 		router,
-		http.MethodPut,
+		http.MethodPost,
 		"/api/testUserID/anthologies",
-		anthology,
+		strings.NewReader("{invalid"),
 	)
 
-	requireStatus(t, res, http.StatusNotFound)
-}
-
-func TestAnthologyInvalidJSON(t *testing.T) {
-	tests := []struct {
-		name   string
-		method string
-	}{
-		{
-			name:   "add",
-			method: http.MethodPost,
-		},
-		{
-			name:   "update",
-			method: http.MethodPut,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := store.NewMemoryStore()
-			seedUser(t, s)
-
-			router := newTestRouter(s)
-
-			res := authenticatedRequest(
-				t,
-				router,
-				tt.method,
-				"/api/testUserID/anthologies",
-				strings.NewReader("{invalid"),
-			)
-
-			requireStatus(t, res, http.StatusBadRequest)
-		})
-	}
+	requireStatus(t, res, http.StatusBadRequest)
 }

@@ -1,6 +1,7 @@
 package api_test
 
 import (
+	"context"
 	"crypto/sha256"
 	"log/slog"
 	"os"
@@ -44,7 +45,7 @@ func seedUser(t *testing.T, s *store.MemoryStore) {
 
 	tokenHash := sha256.Sum256([]byte(testEditToken))
 
-	if err := s.CreateUser(testUserID, tokenHash); err != nil {
+	if err := s.CreateUser(context.Background(), testUserID, tokenHash); err != nil {
 		t.Fatalf("failed to create test user: %v", err)
 	}
 }
