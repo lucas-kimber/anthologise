@@ -57,8 +57,8 @@ func (s *server) authMiddleware() gin.HandlerFunc {
 		targetHash, err := s.store.GetTokenHash(c.Request.Context(), userID)
 
 		if err != nil {
-			slog.Debug("user authentication failed", "userID", userID, "error", err)
-			c.AbortWithStatus(http.StatusInternalServerError)
+			slog.Debug("user authentication failed, could not retreive user", "userID", userID, "error", err)
+			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 

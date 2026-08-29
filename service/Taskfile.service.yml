@@ -54,8 +54,7 @@ tasks:
   test:
     desc: Run the service's test cases.
     dir: ./service
-    env:
-      ANTHOLOGISE_LOG_LEVEL: debug
+    dotenv: [".env.test"]
     cmds:
       - go test ./...
     

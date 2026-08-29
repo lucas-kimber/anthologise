@@ -26,9 +26,7 @@ func (s *server) createUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"userID": newID})
 }
 
-func (s *server) addAnthology(c *gin.Context) {
-
-	userID := c.Param("userID")
+func (s *server) createAnthology(c *gin.Context) {
 
 	var anthology stremio.Anthology
 
@@ -41,8 +39,11 @@ func (s *server) addAnthology(c *gin.Context) {
 	id := stremio.AnthologyIDPrefix + "_" + uuid.NewString()
 	anthology.ID = id
 
-	s.store.CreateAnthology(c.Request.Context(), anthology)
-	s.store.AddAnthologyToCatalog(c.Request.Context(), userID, anthology.ID)
+	if err := s.store.CreateAnthology(c.Request.Context(), anthology); err != nil {
+		slog.Debug("could not create anthology in database", "error", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not create anthology"})
+		return
+	}
 
 	c.JSON(http.StatusCreated, anthology)
 }
@@ -58,6 +59,8 @@ func (s *server) addAnthologyToCatalog(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "anthology not found"})
 		return
 	}
+
+	c.Status(http.StatusNoContent)
 }
 
 func (s *server) removeAnthologyFromCatalog(c *gin.Context) {
@@ -71,4 +74,5 @@ func (s *server) removeAnthologyFromCatalog(c *gin.Context) {
 		return
 	}
 
+	c.Status(http.StatusNoContent)
 }

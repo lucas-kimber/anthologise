@@ -1,6 +1,22 @@
 name: anthologise
 
 services:
+  postgres-test:
+    image: postgres:14.24-alpine3.23
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: anthologise_test
+    ports:
+      - "5433:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d anthologise_test"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+
   service:
     build:
       context: ./service
