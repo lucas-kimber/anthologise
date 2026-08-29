@@ -16,31 +16,6 @@ tasks:
       - task --list
     silent: true
 
-  build:
-    desc: Build all application images
-    cmds:
-      - docker compose build
-
-  up:
-    desc: Build and run the entire application stack
-    cmds:
-      - docker compose up --build --detach
-
-  stop:
-    desc: Stop the entire application stack
-    cmds:
-      - docker compose stop
-
-  down:
-    desc: Stop and remove the entire application stack
-    cmds:
-      - docker compose down
-
-  logs:
-    desc: Follow logs from the entire application stack
-    cmds:
-      - docker compose logs --follow
-    
   test:
     desc: Run all the tests for the project
     cmds:
