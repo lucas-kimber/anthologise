@@ -1,13 +1,63 @@
 package api
 
 import (
+	"context"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/lucas-kimber/anthologise/service/internal/stremio"
 )
+
+const healthCheckTimeout = 2 * time.Second
+
+func (s *server) getManifest(c *gin.Context) {
+	c.JSON(http.StatusOK, s.manifest)
+}
+
+func (s *server) getCatalog(c *gin.Context) {
+
+	userID := c.Param("userID")
+
+	catalog, err := s.store.GetCatalog(c.Request.Context(), userID)
+
+	if err != nil {
+		slog.Error("failed to find catalog for user", "id", userID)
+		c.JSON(http.StatusNotFound, gin.H{"error": "catalog not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, catalog)
+}
+
+func (s *server) getAnthology(c *gin.Context) {
+
+	anthologyID := c.Param("anthologyID")
+
+	anthology, err := s.store.GetAnthology(c.Request.Context(), anthologyID)
+	if err != nil {
+		slog.Error("failed to find anthology", "id", anthologyID)
+		c.JSON(http.StatusNotFound, gin.H{"error": "anthology not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, anthology)
+}
+
+func (s *server) getHealth(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), healthCheckTimeout)
+	defer cancel()
+
+	if err := s.store.Health(ctx); err != nil {
+		slog.Error("health check failed", "error", err)
+		c.Status(http.StatusServiceUnavailable)
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
 
 func (s *server) createUser(c *gin.Context) {
 
