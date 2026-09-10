@@ -44,36 +44,6 @@ func setEditTokenCookie(c *gin.Context, editToken string) {
 	)
 }
 
-func (s *server) createUser(c *gin.Context) {
-
-	newID := createUserID()
-	editToken, tokenHash := createEditToken()
-
-	if err := s.store.CreateUser(newID, tokenHash); err != nil {
-
-		slog.Error("failed to create user", "error", err)
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
-
-	setEditTokenCookie(c, editToken)
-
-	c.JSON(http.StatusCreated, gin.H{"userID": newID})
-}
-
-func (s *server) verifyUser(userID, editToken string) (bool, error) {
-
-	targetHash, err := s.store.GetTokenHash(userID)
-
-	if err != nil {
-		return false, err
-	}
-
-	givenHash := sha256.Sum256([]byte(editToken))
-
-	return subtle.ConstantTimeCompare(targetHash[:], givenHash[:]) == 1, nil
-}
-
 func (s *server) authMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userID := c.Param("userID")
@@ -84,9 +54,18 @@ func (s *server) authMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		valid, err := s.verifyUser(userID, editToken)
+		targetHash, err := s.store.GetTokenHash(c.Request.Context(), userID)
 
-		if !valid || err != nil {
+		if err != nil {
+			slog.Debug("user authentication failed, could not retreive user", "userID", userID, "error", err)
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		givenHash := sha256.Sum256([]byte(editToken))
+		valid := subtle.ConstantTimeCompare(targetHash[:], givenHash[:]) == 1
+
+		if !valid {
 			slog.Debug("user authentication failed", "userID", userID, "error", err)
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return

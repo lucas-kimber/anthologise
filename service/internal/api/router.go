@@ -24,6 +24,8 @@ func NewRouter(manifest stremio.Manifest, store Store, middleware ...gin.Handler
 	r.GET("/:userID/catalog/:type/:anthologyID", server.getCatalog)
 	r.GET("/:userID/meta/:type/:anthologyID", server.getAnthology)
 
+	r.GET("/health", server.getHealth)
+
 	// Config site facing routes
 	r.POST("/api/users", server.createUser)
 
@@ -31,8 +33,9 @@ func NewRouter(manifest stremio.Manifest, store Store, middleware ...gin.Handler
 	private := r.Group("/api/:userID")
 	private.Use(server.authMiddleware())
 
-	private.POST("/anthologies", server.addAnthology)
-	private.PUT("/anthologies", server.updateAnthology)
+	private.POST("/anthologies", server.createAnthology)
+	private.PUT("/catalog/:anthologyID", server.addAnthologyToCatalog)
+	private.DELETE("/catalog/:anthologyID", server.removeAnthologyFromCatalog)
 
 	return r
 }

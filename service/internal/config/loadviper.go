@@ -16,6 +16,7 @@ const (
 	keyAppDescription     = "manifest-description"
 	keyAppLogoURL         = "logo-url"
 	keyAppMainCatalogName = "main-catalog-name"
+	keyDatabaseURL        = "database-url"
 )
 
 // AppConfig contains all the app related options
@@ -43,7 +44,9 @@ type LogConfig struct {
 }
 
 // DBConfig contains all the database options
-type DBConfig struct{}
+type DBConfig struct {
+	DatabaseURL string
+}
 
 // Config contains all the runtime configuration for the project
 type Config struct {
@@ -71,7 +74,9 @@ func loadLog(v *viper.Viper) LogConfig {
 }
 
 func loadDB(v *viper.Viper) DBConfig {
-	return DBConfig{}
+	return DBConfig{
+		v.GetString(keyDatabaseURL),
+	}
 }
 
 func setDefaults(v *viper.Viper) {
