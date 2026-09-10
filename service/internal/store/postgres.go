@@ -4,15 +4,12 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/lucas-kimber/anthologise/service/internal/api"
 	"github.com/lucas-kimber/anthologise/service/internal/stremio"
 )
 
 type PostgresStore struct {
 	db *pgxpool.Pool
 }
-
-var _ api.Store = (*PostgresStore)(nil)
 
 func NewPostgresStore(ctx context.Context, databaseURL string) (*PostgresStore, error) {
 
@@ -182,7 +179,7 @@ func (s *PostgresStore) SetCatalog(ctx context.Context, userID string, anthology
 	}
 
 	if !allExist {
-		return api.ErrAnthologyNotFound
+		return ErrAnthologyNotFound
 	}
 
 	_, err = tx.Exec(ctx, `

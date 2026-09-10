@@ -3,8 +3,8 @@ package main
 import (
 	"log/slog"
 
-	"github.com/lucas-kimber/anthologise/service/internal/api"
 	"github.com/lucas-kimber/anthologise/service/internal/config"
+	"github.com/lucas-kimber/anthologise/service/internal/httpserver"
 	"github.com/lucas-kimber/anthologise/service/internal/stremio"
 )
 
@@ -43,9 +43,9 @@ func main() {
 		CatalogName: cfg.App.MainCatalogName,
 	})
 
-	var store api.Store
+	var store httpserver.Store
 
-	r := api.NewRouter(manifest, store)
+	r := httpserver.NewRouter(manifest, store)
 
 	if err := r.Run(":7000"); err != nil {
 		panic("Fatal error, couldn't start Gin: " + err.Error())

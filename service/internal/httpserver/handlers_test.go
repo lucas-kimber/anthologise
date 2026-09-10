@@ -1,4 +1,4 @@
-package api
+package httpserver
 
 import (
 	"context"
@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lucas-kimber/anthologise/service/internal/store"
 	"github.com/lucas-kimber/anthologise/service/internal/stremio"
 )
 
@@ -58,7 +59,7 @@ func (s *handlersTestStore) SetCatalog(ctx context.Context, userID string, antho
 func (s *handlersTestStore) GetCatalog(ctx context.Context, userID string) (stremio.Catalog, error) {
 
 	if s.userID != userID {
-		return stremio.Catalog{}, ErrUserDoesNotExist
+		return stremio.Catalog{}, store.ErrUserDoesNotExist
 	}
 
 	return s.catalog, nil
@@ -67,7 +68,7 @@ func (s *handlersTestStore) GetCatalog(ctx context.Context, userID string) (stre
 func (s *handlersTestStore) GetAnthology(ctx context.Context, anthologyID string) (stremio.Anthology, error) {
 
 	if s.anthologyID != anthologyID {
-		return stremio.Anthology{}, ErrAnthologyNotFound
+		return stremio.Anthology{}, store.ErrAnthologyNotFound
 	}
 
 	return s.anthology, nil
@@ -263,7 +264,7 @@ func TestSetCatalog(t *testing.T) {
 		{
 			name:     "anthology not found",
 			body:     `{"anthologyIDs":["anthology-1"]}`,
-			storeErr: ErrAnthologyNotFound,
+			storeErr: store.ErrAnthologyNotFound,
 			wantIDs:  []string{"anthology-1"},
 			want:     http.StatusNotFound,
 		},

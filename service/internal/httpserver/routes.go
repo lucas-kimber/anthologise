@@ -1,4 +1,4 @@
-package api
+package httpserver
 
 import (
 	"github.com/gin-contrib/cors"

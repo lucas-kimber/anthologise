@@ -1,4 +1,4 @@
-package api
+package httpserver
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/lucas-kimber/anthologise/service/internal/store"
 	"github.com/lucas-kimber/anthologise/service/internal/stremio"
 )
 
@@ -115,7 +116,7 @@ func (s *server) setCatalog(c *gin.Context) {
 
 	if err := s.store.SetCatalog(c.Request.Context(), userID, req.AnthologyIDs); err != nil {
 
-		if errors.Is(err, ErrAnthologyNotFound) {
+		if errors.Is(err, store.ErrAnthologyNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "catalog contains a non-existant anthology id"})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update catalog"})
