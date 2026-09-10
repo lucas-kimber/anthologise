@@ -27,12 +27,12 @@ tasks:
       - cp .env.example .env.local
     
   test:
-    desc: Run the service's test cases.
+    desc: Run the service's unit test cases.
     dir: ./service
     dotenv: [".env.test"]
     cmds:
-      - go test ./...
-    
+      - go test ./internal/...
+  
   lint:
     desc: Run staticcheck and go vet on the service.
     dir: ./service

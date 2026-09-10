@@ -25,6 +25,10 @@ func NewPostgresStore(ctx context.Context, databaseURL string) (*PostgresStore, 
 	return &PostgresStore{db: dbConn}, nil
 }
 
+func (s *PostgresStore) Health(ctx context.Context) error {
+	return s.db.Ping(ctx)
+}
+
 func (s *PostgresStore) Migrate(ctx context.Context) error {
 
 	q := `

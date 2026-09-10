@@ -19,6 +19,8 @@ type Store interface {
 	GetCatalog(ctx context.Context, userID string) (stremio.Catalog, error)
 	GetAnthology(ctx context.Context, anthologyID string) (stremio.Anthology, error)
 
+	Health(ctx context.Context) error
+
 	CreateUser(ctx context.Context, userID string, editTokenHash [32]byte) error
 	GetTokenHash(ctx context.Context, userID string) ([32]byte, error)
 
