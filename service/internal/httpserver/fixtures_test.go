@@ -28,6 +28,7 @@ var (
 				Overview: "Test Overview",
 			},
 		},
+		
 	}
 	testCatalog = stremio.Catalog{
 		Metas: []stremio.AnthologyPreview{testAnthology.AnthologyPreview},
