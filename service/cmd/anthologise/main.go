@@ -75,7 +75,7 @@ func main() {
 	r := httpserver.NewRouter(manifest, store)
 
 	srv := &http.Server{
-		Addr:    ":7000",
+		Addr:    ":" + cfg.App.Port,
 		Handler: r,
 	}
 

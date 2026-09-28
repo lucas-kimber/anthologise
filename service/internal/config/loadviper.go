@@ -11,6 +11,7 @@ const (
 	keyLogJSON            = "json-logging"
 	keyLogLevel           = "log-level"
 	keyAppStremioID       = "stremio-id"
+	keyAppPort            = "port"
 	keyAppVersion         = "version-number"
 	keyAppName            = "app-name"
 	keyAppDescription     = "manifest-description"
@@ -23,6 +24,8 @@ const (
 type AppConfig struct {
 	// StremioID is the ID for the add-on used by the manifest
 	StremioID string
+	// Port is the port for the HTTP server to run on
+	Port string
 	// Version is the current app version
 	Version string
 	// Name is the name of the add-on used by the manifest
@@ -58,6 +61,7 @@ type Config struct {
 func loadApp(v *viper.Viper) AppConfig {
 	return AppConfig{
 		v.GetString(keyAppStremioID),
+		v.GetString(keyAppPort),
 		v.GetString(keyAppVersion),
 		v.GetString(keyAppName),
 		v.GetString(keyAppDescription),
