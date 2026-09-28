@@ -38,7 +38,7 @@ tasks:
     dir: ./service
     dotenv: [".env.test"]
     cmds:
-      - go test ./integration/...
+      - go test -v -count=1 ./integration/...
 
   lint:
     desc: Run staticcheck and go vet on the service.
