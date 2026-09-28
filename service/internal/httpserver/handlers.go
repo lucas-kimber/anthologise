@@ -88,7 +88,7 @@ func (s *server) createAnthology(c *gin.Context) {
 		return
 	}
 
-	id := stremio.AnthologyIDPrefix + "_" + uuid.NewString()
+	id := stremio.AnthologyIDPrefix + uuid.NewString()
 	anthology.ID = id
 
 	if err := s.store.CreateAnthology(c.Request.Context(), anthology); err != nil {
