@@ -28,13 +28,13 @@ func NewRouter(manifest stremio.Manifest, store Store, middleware ...gin.Handler
 
 	// Config site facing routes
 	r.POST("/api/users", server.createUser)
+	r.POST("/api/anthologies", server.createAnthology)
 
 	// Private api routes
 	private := r.Group("/api/:userID")
 	private.Use(server.authMiddleware())
 
-	private.POST("/anthologies", server.createAnthology)
-	private.PUT("/catalog/:userID", server.setCatalog)
+	private.PUT("/catalog/", server.setCatalog)
 
 	return r
 }
