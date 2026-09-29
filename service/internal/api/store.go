@@ -25,6 +25,5 @@ type Store interface {
 	GetTokenHash(ctx context.Context, userID string) ([32]byte, error)
 
 	CreateAnthology(ctx context.Context, anthology stremio.Anthology) error
-	AddAnthologyToCatalog(ctx context.Context, userID string, anthologyID string) error
-	RemoveAnthologyFromCatalog(ctx context.Context, userID string, anthologyID string) error
+	SetCatalog(ctx context.Context, userID string, anthologyIDs []string) error
 }

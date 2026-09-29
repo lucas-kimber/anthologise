@@ -155,28 +155,6 @@ func (s *PostgresStore) GetTokenHash(ctx context.Context, userID string) ([32]by
 	return hash, nil
 }
 
-func (s *PostgresStore) RemoveAnthologyFromCatalog(ctx context.Context, userID string, anthologyID string) error {
-
-	q := `
-		DELETE FROM user_anthologies
-		WHERE user_id = $1 AND anthology_id = $2
-	`
-
-	_, err := s.db.Exec(ctx, q, userID, anthologyID)
-	return err
-}
-
-func (s *PostgresStore) AddAnthologyToCatalog(ctx context.Context, userID string, anthologyID string) error {
-	q := `
-		INSERT INTO user_anthologies (user_id, anthology_id)
-		VALUES ($1, $2)
-		ON CONFLICT (user_id, anthology_id) DO NOTHING 
-	`
-
-	_, err := s.db.Exec(ctx, q, userID, anthologyID)
-	return err
-}
-
 func (s *PostgresStore) SetCatalog(ctx context.Context, userID string, anthologyIDs []string) error {
 
 	tx, err := s.db.Begin(ctx)
@@ -184,6 +162,28 @@ func (s *PostgresStore) SetCatalog(ctx context.Context, userID string, anthology
 		return err
 	}
 	defer tx.Rollback(ctx)
+
+	var allExist bool
+
+	err = tx.QueryRow(ctx, `
+		SELECT NOT EXISTS (
+			SELECT 1
+			FROM unnest($1::text[]) AS id
+			WHERE NOT EXISTS (
+				SELECT 1
+				FROM anthologies
+				WHERE anthologies.id = id
+			)
+		)
+	`, anthologyIDs).Scan(&allExist)
+
+	if err != nil {
+		return err
+	}
+
+	if !allExist {
+		return api.ErrAnthologyNotFound
+	}
 
 	_, err = tx.Exec(ctx, `
 		DELETE FROM user_anthologies 

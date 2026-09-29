@@ -23,13 +23,9 @@ type handlersConfigTestStore struct {
 	createdAnthology   stremio.Anthology
 	createAnthologyErr error
 
-	addedUserID      string
-	addedAnthologyID string
-	addToCatalogErr  error
-
-	removedUserID        string
-	removedAnthologyID   string
-	removeFromCatalogErr error
+	setCatalogUserID       string
+	setCatalogAnthologyIDs []string
+	setCatalogErr          error
 }
 
 func (s *handlersConfigTestStore) CreateUser(ctx context.Context, userID string, tokenHash [32]byte) error {
@@ -46,20 +42,12 @@ func (s *handlersConfigTestStore) CreateAnthology(ctx context.Context, anthology
 	return s.createAnthologyErr
 }
 
-func (s *handlersConfigTestStore) AddAnthologyToCatalog(ctx context.Context, userID string, anthologyID string) error {
+func (s *handlersConfigTestStore) SetCatalog(ctx context.Context, userID string, anthologyIDs []string) error {
 
-	s.addedUserID = userID
-	s.addedAnthologyID = anthologyID
+	s.setCatalogUserID = userID
+	s.setCatalogAnthologyIDs = anthologyIDs
 
-	return s.addToCatalogErr
-}
-
-func (s *handlersConfigTestStore) RemoveAnthologyFromCatalog(ctx context.Context, userID string, anthologyID string) error {
-
-	s.removedUserID = userID
-	s.removedAnthologyID = anthologyID
-
-	return s.removeFromCatalogErr
+	return s.setCatalogErr
 }
 
 func newConfigHandlersTestRouter(store *handlersConfigTestStore) *gin.Engine {
@@ -72,8 +60,7 @@ func newConfigHandlersTestRouter(store *handlersConfigTestStore) *gin.Engine {
 
 	r.POST("/api/users", server.createUser)
 	r.POST("/api/anthologies", server.createAnthology)
-	r.POST("/api/:userID/catalog/:anthologyID", server.addAnthologyToCatalog)
-	r.DELETE("/api/:userID/catalog/:anthologyID", server.removeAnthologyFromCatalog)
+	r.PUT("/api/:userID/catalog", server.setCatalog)
 
 	return r
 }
@@ -219,21 +206,45 @@ func TestCreateAnthology(t *testing.T) {
 	}
 }
 
-func TestAddAnthologyToCatalog(t *testing.T) {
+func TestSetCatalog(t *testing.T) {
 
 	tests := []struct {
 		name     string
+		body     string
 		storeErr error
+		wantIDs  []string
 		want     int
 	}{
 		{
-			name: "success",
-			want: http.StatusNoContent,
+			name:    "success",
+			body:    `{"anthologyIDs":["anthology-1","anthology-2"]}`,
+			wantIDs: []string{"anthology-1", "anthology-2"},
+			want:    http.StatusNoContent,
+		},
+		{
+			name:    "empty catalog",
+			body:    `{"anthologyIDs":[]}`,
+			wantIDs: []string{},
+			want:    http.StatusNoContent,
+		},
+		{
+			name: "invalid request",
+			body: "{invalid",
+			want: http.StatusBadRequest,
 		},
 		{
 			name:     "anthology not found",
+			body:     `{"anthologyIDs":["anthology-1"]}`,
 			storeErr: ErrAnthologyNotFound,
+			wantIDs:  []string{"anthology-1"},
 			want:     http.StatusNotFound,
+		},
+		{
+			name:     "store failure",
+			body:     `{"anthologyIDs":["anthology-1"]}`,
+			storeErr: errors.New("test store error"),
+			wantIDs:  []string{"anthology-1"},
+			want:     http.StatusInternalServerError,
 		},
 	}
 
@@ -242,16 +253,18 @@ func TestAddAnthologyToCatalog(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			store := &handlersConfigTestStore{
-				addToCatalogErr: tt.storeErr,
+				setCatalogErr: tt.storeErr,
 			}
 
 			r := newConfigHandlersTestRouter(store)
 
 			req := httptest.NewRequest(
-				http.MethodPost,
-				"/api/"+testUserID+"/catalog/"+testAnthologyID,
-				nil,
+				http.MethodPut,
+				"/api/"+testUserID+"/catalog",
+				strings.NewReader(tt.body),
 			)
+
+			req.Header.Set("Content-Type", "application/json")
 
 			res := httptest.NewRecorder()
 			r.ServeHTTP(res, req)
@@ -260,64 +273,16 @@ func TestAddAnthologyToCatalog(t *testing.T) {
 				t.Errorf("got %d, want %d", res.Code, tt.want)
 			}
 
-			if store.addedUserID != testUserID {
-				t.Errorf("got userID %s, want %s", store.addedUserID, testUserID)
+			if tt.want == http.StatusBadRequest {
+				return
 			}
 
-			if store.addedAnthologyID != testAnthologyID {
-				t.Errorf("got anthologyID %s, want %s", store.addedAnthologyID, testAnthologyID)
-			}
-		})
-	}
-}
-
-func TestRemoveAnthologyFromCatalog(t *testing.T) {
-
-	tests := []struct {
-		name     string
-		storeErr error
-		want     int
-	}{
-		{
-			name: "success",
-			want: http.StatusNoContent,
-		},
-		{
-			name:     "anthology not found",
-			storeErr: ErrAnthologyNotFound,
-			want:     http.StatusNotFound,
-		},
-	}
-
-	for _, tt := range tests {
-
-		t.Run(tt.name, func(t *testing.T) {
-
-			store := &handlersConfigTestStore{
-				removeFromCatalogErr: tt.storeErr,
+			if store.setCatalogUserID != testUserID {
+				t.Errorf("got userID %s, want %s", store.setCatalogUserID, testUserID)
 			}
 
-			r := newConfigHandlersTestRouter(store)
-
-			req := httptest.NewRequest(
-				http.MethodDelete,
-				"/api/"+testUserID+"/catalog/"+testAnthologyID,
-				nil,
-			)
-
-			res := httptest.NewRecorder()
-			r.ServeHTTP(res, req)
-
-			if res.Code != tt.want {
-				t.Errorf("got %d, want %d", res.Code, tt.want)
-			}
-
-			if store.removedUserID != testUserID {
-				t.Errorf("got userID %s, want %s", store.removedUserID, testUserID)
-			}
-
-			if store.removedAnthologyID != testAnthologyID {
-				t.Errorf("got anthologyID %s, want %s", store.removedAnthologyID, testAnthologyID)
+			if !reflect.DeepEqual(store.setCatalogAnthologyIDs, tt.wantIDs) {
+				t.Errorf("got anthologyIDs %v, want %v", store.setCatalogAnthologyIDs, tt.wantIDs)
 			}
 		})
 	}

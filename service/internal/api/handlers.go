@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"net/http"
 	"time"
@@ -98,29 +99,28 @@ func (s *server) createAnthology(c *gin.Context) {
 	c.JSON(http.StatusCreated, anthology)
 }
 
-func (s *server) addAnthologyToCatalog(c *gin.Context) {
-
+func (s *server) setCatalog(c *gin.Context) {
 	userID := c.Param("userID")
-	anthologyID := c.Param("anthologyID")
 
-	if err := s.store.AddAnthologyToCatalog(c.Request.Context(), userID, anthologyID); err != nil {
+	var req struct {
+		AnthologyIDs []string `json:"anthologyIDs"`
+	}
 
-		slog.Info("failed to find anthology", "id", anthologyID)
-		c.JSON(http.StatusNotFound, gin.H{"error": "anthology not found"})
+	if err := c.ShouldBindJSON(&req); err != nil {
+
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid catalog"})
+
 		return
 	}
 
-	c.Status(http.StatusNoContent)
-}
+	if err := s.store.SetCatalog(c.Request.Context(), userID, req.AnthologyIDs); err != nil {
 
-func (s *server) removeAnthologyFromCatalog(c *gin.Context) {
-	userID := c.Param("userID")
-	anthologyID := c.Param("anthologyID")
+		if errors.Is(err, ErrAnthologyNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "catalog contains a non-existant anthology id"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update catalog"})
+		}
 
-	if err := s.store.RemoveAnthologyFromCatalog(c.Request.Context(), userID, anthologyID); err != nil {
-
-		slog.Info("failed to find anthology", "id", anthologyID)
-		c.JSON(http.StatusNotFound, gin.H{"error": "anthology not found"})
 		return
 	}
 
