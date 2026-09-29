@@ -72,6 +72,11 @@ func main() {
 
 	defer store.Close()
 
+	if err := store.Migrate(context.Background()); err != nil {
+		slog.Error("database migration failed", "error", err)
+		panic("Fatal error, couldn't run database migration: " + err.Error())
+	}
+
 	r := httpserver.NewRouter(manifest, store)
 
 	srv := &http.Server{
