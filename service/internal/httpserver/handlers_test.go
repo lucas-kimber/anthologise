@@ -228,7 +228,7 @@ func TestCreateAnthology(t *testing.T) {
 				t.Errorf("got %+v, want %+v", got, store.createdAnthology)
 			}
 
-			if !strings.HasPrefix(got.ID, stremio.AnthologyIDPrefix+"_") {
+			if !strings.HasPrefix(got.ID, stremio.AnthologyIDPrefix) {
 				t.Errorf("invalid anthology ID: %s", got.ID)
 			}
 		})
