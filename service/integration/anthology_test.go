@@ -6,7 +6,7 @@ func TestCreateAndGetAnthology(t *testing.T) {
 	user := createUser(t)
 	want := loadAnthologyFixture(t, "anthology_a.json")
 
-	created := createAnthology(t, user, want)
+	created := createAnthology(t, want)
 	got := getAnthology(t, user.ID, created.Type, created.ID)
 
 	if got.ID != created.ID {

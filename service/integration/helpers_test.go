@@ -134,11 +134,10 @@ func createUser(t *testing.T) testUser {
 	return testUser{ID: result.UserID, Cookie: cookie}
 }
 
-func createAnthology(t *testing.T, user testUser, anthology stremio.Anthology) stremio.Anthology {
+func createAnthology(t *testing.T, anthology stremio.Anthology) stremio.Anthology {
 	t.Helper()
 
-	url := fmt.Sprintf("%s/api/%s/anthologies", baseURL, user.ID)
-	resp := doJSONRequest(t, http.MethodPost, url, anthology, user.Cookie)
+	resp := doJSONRequest(t, http.MethodPost, baseURL+"/api/anthologies", anthology, nil)
 	requireStatus(t, resp, http.StatusCreated)
 
 	return decodeJSON[stremio.Anthology](t, resp)
@@ -152,4 +151,36 @@ func getAnthology(t *testing.T, userID, anthologyType, anthologyID string) strem
 	requireStatus(t, resp, http.StatusOK)
 
 	return decodeJSON[stremio.Anthology](t, resp)
+}
+
+func getCatalog(t *testing.T, userID string) stremio.Catalog {
+	t.Helper()
+
+	url := fmt.Sprintf("%s/%s/catalog/series/anthologise", baseURL, userID)
+	resp := doJSONRequest(t, http.MethodGet, url, nil, nil)
+	requireStatus(t, resp, http.StatusOK)
+
+	return decodeJSON[stremio.Catalog](t, resp)
+}
+
+func requestSetCatalog(t *testing.T, user testUser, anthologyIDs []string) *http.Response {
+	t.Helper()
+
+	body := struct {
+		AnthologyIDs []string `json:"anthologyIDs"`
+	}{
+		AnthologyIDs: anthologyIDs,
+	}
+
+	url := fmt.Sprintf("%s/api/%s/catalog", baseURL, user.ID)
+	return doJSONRequest(t, http.MethodPut, url, body, user.Cookie)
+}
+
+func setCatalog(t *testing.T, user testUser, anthologyIDs []string) {
+	t.Helper()
+
+	resp := requestSetCatalog(t, user, anthologyIDs)
+	defer resp.Body.Close()
+
+	requireStatus(t, resp, http.StatusNoContent)
 }
