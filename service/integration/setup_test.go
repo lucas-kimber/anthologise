@@ -3,6 +3,8 @@ package integration
 import (
 	"context"
 	"fmt"
+	"io"
+	"log"
 	"os"
 	"testing"
 
@@ -44,7 +46,29 @@ func TestMain(m *testing.M) {
 		os.Getenv("ANTHOLOGISE_PORT"),
 	)
 
+	serviceContainer, err := stack.ServiceContainer(ctx, "service")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	code := m.Run()
+
+	if code != 0 {
+		logs, err := serviceContainer.Logs(context.Background())
+
+		if err != nil {
+			log.Printf("failed to get service logs: %v", err)
+		} else {
+			defer logs.Close()
+
+			data, err := io.ReadAll(logs)
+			if err != nil {
+				log.Printf("failed to read service logs: %v", err)
+			} else {
+				log.Printf("service logs:\n%s", data)
+			}
+		}
+	}
 
 	if err := stack.Down(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "failed to stop test stack:", err)

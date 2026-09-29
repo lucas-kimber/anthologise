@@ -1,0 +1,13 @@
+{
+  "id": "22222222-2222-4222-8222-222222222222",
+  "type": "series",
+  "name": "Anthology B",
+  "poster": "https://example.com/b.jpg",
+  "videos": [
+    {
+      "id": "tt0000002",
+      "title": "Video B1",
+      "released": "2021-01-01T00:00:00.000Z"
+    }
+  ]
+}
