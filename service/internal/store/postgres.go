@@ -60,17 +60,6 @@ func (s *PostgresStore) Close() {
 	s.db.Close()
 }
 
-func (s *PostgresStore) AddAnthologyToCatalog(ctx context.Context, userID string, anthologyID string) error {
-	q := `
-		INSERT INTO user_anthologies (user_id, anthology_id)
-		VALUES ($1, $2)
-		ON CONFLICT (user_id, anthology_id) DO NOTHING 
-	`
-
-	_, err := s.db.Exec(ctx, q, userID, anthologyID)
-	return err
-}
-
 func (s *PostgresStore) CreateAnthology(ctx context.Context, anthology stremio.Anthology) error {
 
 	q := `
@@ -175,4 +164,45 @@ func (s *PostgresStore) RemoveAnthologyFromCatalog(ctx context.Context, userID s
 
 	_, err := s.db.Exec(ctx, q, userID, anthologyID)
 	return err
+}
+
+func (s *PostgresStore) AddAnthologyToCatalog(ctx context.Context, userID string, anthologyID string) error {
+	q := `
+		INSERT INTO user_anthologies (user_id, anthology_id)
+		VALUES ($1, $2)
+		ON CONFLICT (user_id, anthology_id) DO NOTHING 
+	`
+
+	_, err := s.db.Exec(ctx, q, userID, anthologyID)
+	return err
+}
+
+func (s *PostgresStore) SetCatalog(ctx context.Context, userID string, anthologyIDs []string) error {
+
+	tx, err := s.db.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	_, err = tx.Exec(ctx, `
+		DELETE FROM user_anthologies 
+		WHERE user_id = $1
+	`, userID)
+
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec(ctx, `
+		INSERT INTO user_anthologies (user_id, anthology_id)
+		SELECT $1, id
+		FROM unnest($2::text[]) AS id
+	`, userID, anthologyIDs)
+
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit(ctx)
 }
