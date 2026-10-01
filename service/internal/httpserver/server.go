@@ -1,18 +1,10 @@
-package api
+package httpserver
 
 import (
 	"context"
-	"errors"
 
 	"github.com/lucas-kimber/anthologise/service/internal/stremio"
 )
-
-var ErrCatalogNotFound = errors.New("catalog item not found")
-var ErrAnthologyNotFound = errors.New("anthology item not found")
-var ErrAnthologyNotInCatalog = errors.New("anthology item not found")
-var ErrAnthologyAlreadyExists = errors.New("anthology item already exists")
-var ErrUserDoesNotExist = errors.New("user not found")
-var ErrUserAlreadyExists = errors.New("user id already exists")
 
 // Store defines the methods that the API handlers expect to be available for retreiving resources from the database
 type Store interface {
@@ -26,4 +18,16 @@ type Store interface {
 
 	CreateAnthology(ctx context.Context, anthology stremio.Anthology) error
 	SetCatalog(ctx context.Context, userID string, anthologyIDs []string) error
+}
+
+type server struct {
+	manifest stremio.Manifest
+	store    Store
+}
+
+func newServer(manifest stremio.Manifest, store Store) *server {
+	return &server{
+		manifest: manifest,
+		store:    store,
+	}
 }

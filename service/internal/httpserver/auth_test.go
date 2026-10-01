@@ -1,4 +1,4 @@
-package api
+package httpserver
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lucas-kimber/anthologise/service/internal/store"
 )
 
 type authTestStore struct {
@@ -21,7 +22,7 @@ func (s authTestStore) GetTokenHash(ctx context.Context, userID string) ([32]byt
 
 	if userID != s.userID {
 		var b [32]byte
-		return b, ErrUserDoesNotExist
+		return b, store.ErrUserDoesNotExist
 	}
 
 	return s.tokenHash, nil
