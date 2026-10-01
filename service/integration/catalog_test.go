@@ -25,7 +25,7 @@ func TestMutateCatalog(t *testing.T) {
 	c = getCatalog(t, user.ID)
 
 	if len(c.Metas) != 2 {
-		t.Errorf("expected 2 catalog entries, got %d", len(c.Metas))
+		t.Fatalf("expected 2 catalog entries, got %d", len(c.Metas))
 	}
 
 	if c.Metas[0].ID != a1ID {
@@ -76,5 +76,9 @@ func TestEditingUnownedCatalogs(t *testing.T) {
 
 	if len(c.Metas) == 0 {
 		t.Fatalf("expected catalog to remain unchanged, got %v", c)
+	}
+
+	if c.Metas[0].ID != aID {
+		t.Errorf("expected catalog entry %q, got %q", aID, c.Metas[0].ID)
 	}
 }
