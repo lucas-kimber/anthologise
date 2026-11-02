@@ -4,7 +4,7 @@ Anthologise is an early-stage Stremio add-on that combines films and episodes fr
 
 ## Status
 
-Currently under development. The initial Stremio endpoints, config enpoints, and service structure are in place, but persistent storage are not yet implemented.
+Currently under development. The initial Stremio endpoints, config enpoints, and database are complete. Currently building out the frontend.
 
 ## Dev Info
 
